@@ -53,11 +53,11 @@ public class TileLand {
 		long lastLog = System.currentTimeMillis();
 		double unprocessed = 0;
 		long ticks = 0;
-		level = new Level(20, 20);
+		level = new Level(64, 64);
 		level.save();
 		Point accumDelta = new Point(0, 0); // In pixels, accumulates deltas from input handler
 		
-		ply = new Player("calzoneman", level, new Point(1, 1), input);
+		ply = new Player("Player", level, new Point(1, 1), input);
 		ply.setLevelDelta(new Point(ply.getLevelDelta().x - screen.getWidth() / level.TILESIZE / 2,
 				ply.getLevelDelta().y - screen.getHeight() / level.TILESIZE / 2));
 		

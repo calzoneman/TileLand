@@ -55,7 +55,7 @@ public class Tile {
 	}
 	
 	public BufferedImage getTextureClone() {
-		BufferedImage clone = new BufferedImage(texture.getWidth(), texture.getHeight(), texture.getType());
+		BufferedImage clone = new BufferedImage(texture.getWidth(), texture.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = (Graphics2D)clone.getGraphics();
 		g2d.drawImage(texture, null, 0, 0);
 		return clone;

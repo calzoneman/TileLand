@@ -8,8 +8,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import net.calzoneman.TileLand.TileDefinitions.BgTileTypes;
-import net.calzoneman.TileLand.TileDefinitions.FgTileTypes;
 
 public class Player {
 
@@ -41,15 +39,15 @@ public class Player {
 		this.level = lvl;
 		this.input = input;
 		loadDefaultSprite();
-		this.currentFgTile = TileDefinitions.getFg(1);//TileDefinitions.getFg(FgTileTypes.TREE1.getId());
-		this.currentBgTile = TileDefinitions.getBg(1);//TileDefinitions.getBg(BgTileTypes.GRASS1.getId());
+		this.currentFgTile = TileDefinitions.getFg(TileTypes.BG_GRASS1);
+		this.currentBgTile = TileDefinitions.getBg(TileTypes.FG_TREE1);
 		this.editingFg = false;
 		this.setLevelDelta(new Point(0, 0));
 	}
 	
 	public void loadDefaultSprite() {
 		try {
-			this.sprite = ImageIO.read(new File("pokeball.png"));
+			this.sprite = ImageIO.read(new File("res/pokeball.png"));
 		}
 		catch(IOException ex) {
 			System.err.println("Failed to load sprite");
@@ -67,19 +65,19 @@ public class Player {
 			else if(input.keyDownOnce(KeyEvent.VK_D)) d = true;
 			
 			// Hit detection
-			if(w && !a && !d && !level.getFg(position.x, position.y-1).isSolid()) {
+			if(w && !a && !d && position.y > 0 && !level.getFg(position.x, position.y-1).isSolid()) {
 				position.y--;
 				levelDelta.y--;
 			}
-			else if(s && !a && !d && !level.getFg(position.x, position.y+1).isSolid()) {
+			else if(s && !a && !d && position.y < level.getHeight()-1 && !level.getFg(position.x, position.y+1).isSolid()) {
 				position.y++;
 				levelDelta.y++;
 			}
-			else if(a && !w && !s && !level.getFg(position.x-1, position.y).isSolid()) {
+			else if(a && !w && !s && position.x > 0 && !level.getFg(position.x-1, position.y).isSolid()) {
 				position.x--;
 				levelDelta.x--;
 			}
-			else if(d && !w && !s && !level.getFg(position.x+1, position.y).isSolid()) {
+			else if(d && !w && !s && position.x < level.getWidth()-1 && !level.getFg(position.x+1, position.y).isSolid()) {
 				position.x++;
 				levelDelta.x++;
 			}

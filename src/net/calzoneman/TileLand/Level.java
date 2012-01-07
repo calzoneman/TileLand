@@ -8,10 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import net.calzoneman.TileLand.TileDefinitions.BgTileTypes;
-import net.calzoneman.TileLand.TileDefinitions.FgTileTypes;
-
-
 public class Level {
 	public static final int HEADER_SIZE = 4;
 	public static final int TILESIZE = 32;
@@ -77,7 +73,7 @@ public class Level {
 		if(x < 0 || x >= width || y < 0 || y >= height) {
 			return false;
 		}
-		fgTiles[y * width + x] = id;
+		bgTiles[y * width + x] = id;
 		return true;
 	}
 	
@@ -139,13 +135,13 @@ public class Level {
 			for(int j = 0; j < height; j++) {
 				int grass = rand.nextInt(100);
 				if(grass <  5) {
-					bgTiles[j * width + i] = BgTileTypes.GRASS2.getId();
+					bgTiles[j * width + i] = TileTypes.BG_GRASS2;
 				}
 				else if(grass < 10) {
-					bgTiles[j * width + i] = BgTileTypes.GRASS3.getId();
+					bgTiles[j * width + i] = TileTypes.BG_GRASS3;
 				}
 				else if(grass < 20) {
-					bgTiles[j * width + i] = BgTileTypes.GRASS4.getId();
+					bgTiles[j * width + i] = TileTypes.BG_GRASS4;
 				}
 				else {
 					bgTiles[j * width + i] = TileDefinitions.DEFAULTBG.getId();
@@ -157,13 +153,13 @@ public class Level {
 			for(int j = 0; j < height; j++) {
 				double fgstuff = rand.nextDouble();
 				if(fgstuff < 0.05) {
-					fgTiles[j * width + i] = FgTileTypes.TREE1.getId();
+					fgTiles[j * width + i] = TileTypes.FG_TREE1;
 				}
 				else if(fgstuff < 0.07) {
-					fgTiles[j * width + i] = FgTileTypes.TREE2.getId();
+					fgTiles[j * width + i] = TileTypes.FG_TREE2;
 				}
 				else if(fgstuff < 0.071) {
-					fgTiles[j *  width + i] = FgTileTypes.ROCK2.getId();
+					fgTiles[j *  width + i] = TileTypes.FG_ROCK2;
 				}
 				else {
 					fgTiles[j * width + i] = TileDefinitions.DEFAULTFG.getId();
