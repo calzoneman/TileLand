@@ -1,8 +1,12 @@
 package net.calzoneman.TileLand;
 
+import java.awt.AWTException;
+import java.awt.BufferCapabilities;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -39,13 +43,22 @@ public class TileLand {
 		screen.addMouseListener(input);
 		screen.addMouseMotionListener(input);
 		screen.addKeyListener(input);
+		screen.addFocusListener(input);
 		screen.requestFocusInWindow();
 		
 		frame.getContentPane().add(screen);
 		frame.pack();
 		frame.setVisible(true);
 		
-		screen.createBufferStrategy(2); // Double buffer to prevent flicker
+		GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+		BufferCapabilities bufCapabilities = config.getBufferCapabilities();
+		try {
+			screen.createBufferStrategy(2, bufCapabilities);
+		} 
+		catch (AWTException ex) {
+			System.err.println("Error creating BufferStrategy");
+		} 
+		// Double buffer to prevent flicker
 		BufferStrategy bufStrategy = screen.getBufferStrategy();
 		
 		double nsPerTick = 1000000000.0 / 30; // 30 ticks per second
@@ -106,15 +119,10 @@ public class TileLand {
 			long rStart = System.nanoTime();
 			
 			Graphics g = bufStrategy.getDrawGraphics();
-			Graphics2D g2d = (Graphics2D)g;
-			// Clear the screen
-			screen.update(g); 
-			// Render the current chunk
+
+			// Render the game
+			g.fillRect(0, 0, screen.getWidth(), screen.getHeight());
 			render(g, ply, ticks);
-			// Draw the player
-			//g2d.drawImage(ply.getSprite(), null, (ply.getPosition().x - ply.getChunkDelta().x) * Chunk.TILESIZE, 
-			//									 (ply.getPosition().y - ply.getChunkDelta().y) * Chunk.TILESIZE);
-			
 			double rDiff = (System.nanoTime() - rStart) / 1000000.0;
 			char[] fpsString = ("FPS: " + 1000.0/rDiff).toCharArray();
 			g.drawChars(fpsString, 0, fpsString.length, 0, 10);
@@ -138,7 +146,7 @@ public class TileLand {
 		Level level = ply.getLevel();
 		Point renderDelta = ply.getLevelDelta();
 		if(level != null) {
-			level.render(g, renderDelta.x, renderDelta.y, level.getWidth(), level.getHeight());
+			level.render(g, renderDelta.x, renderDelta.y, screen.getWidth() / level.TILESIZE, screen.getHeight() / level.TILESIZE);
 		}
 		Graphics2D g2d = (Graphics2D)g;
 		g2d.drawImage(ply.getSprite(), null, ply.getOffsetPosition().x * level.TILESIZE, ply.getOffsetPosition().y * level.TILESIZE);

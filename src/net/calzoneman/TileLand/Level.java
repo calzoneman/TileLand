@@ -2,7 +2,11 @@ package net.calzoneman.TileLand;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +28,15 @@ public class Level {
 	
 	public String name = "untitled level";
 	
+	private boolean needsRedraw = true;
+	private ArrayList<TileChange> fgChanges;
+	private ArrayList<TileChange> bgChanges;
+	private BufferedImage drawn;
+	
 	public Level() {
 		rand = new Random();
+		fgChanges = new ArrayList<TileChange>();
+		bgChanges = new ArrayList<TileChange>();
 	}
 	
 	public Level(int width, int height) {
@@ -33,6 +44,8 @@ public class Level {
 		this.width = width;
 		this.height = height;
 		this.generate(width, height);
+		GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+		drawn = config.createCompatibleImage(width * TILESIZE, height * TILESIZE, Transparency.TRANSLUCENT);
 	}
 	
 	public Level(int width, int height, String name) {
@@ -74,6 +87,7 @@ public class Level {
 			return false;
 		}
 		bgTiles[y * width + x] = id;
+		bgChanges.add(new TileChange(x, y, id, false));
 		return true;
 	}
 	
@@ -98,6 +112,7 @@ public class Level {
 			return false;
 		}
 		fgTiles[y * width + x] = id;
+		fgChanges.add(new TileChange(x, y, id, true));
 		return true;
 	}
 	
@@ -107,9 +122,19 @@ public class Level {
 	
 	// Rendering
 	public void render(Graphics g, int offX, int offY, int maxW, int maxH) {
-		Graphics2D g2d = (Graphics2D)g;
-		for(int i = offX; i < width && i < maxW; i++) {
-			for(int j = offY; j < height && j < maxH; j++) {
+		if(needsRedraw) {
+			redraw(g, offX, offY, maxW, maxH);
+		}
+		else {
+			update(g, offX, offY, maxW, maxH);
+		}
+		((Graphics2D)g).drawImage(drawn, null, 0, 0);//offX * TILESIZE, offY * TILESIZE);
+	}
+	public void redraw(Graphics g, int offX, int offY, int maxW, int maxH) {
+		Graphics2D g2d = (Graphics2D)drawn.getGraphics();
+		g2d.fillRect(0, 0, width * TILESIZE, height * TILESIZE);
+		for(int i = offX; i < width && i < maxW + offX; i++) {
+			for(int j = offY; j < height && j < maxH + offY; j++) {
 				Tile bg = getBg(i, j);
 				Tile fg = getFg(i, j);
 				if(bg != null) {
@@ -120,10 +145,29 @@ public class Level {
 				}
 			}
 		}
+		needsRedraw = false;
 	}
 	
-	public void render(Graphics g) {
-		render(g, 0, 0, width, height);
+	public void update(Graphics g, int offX, int offY, int maxW, int maxH) {
+		Graphics2D g2d = (Graphics2D)drawn.getGraphics();
+		for(TileChange change : bgChanges) {
+			if(change.x >= offX && change.x < maxW + offX && change.y >= offY && change.y < maxH + offY) {
+				Tile tile = getBg(change.x, change.y);
+				if(tile != null) {
+					g2d.drawImage(tile.getTexture(), null, (change.x) * TILESIZE, (offY) * TILESIZE);
+				}
+			}
+		}
+		bgChanges.clear();
+		for(TileChange change : fgChanges) {
+			if(change.x >= offX && change.x < maxW + offX && change.y >= offY && change.y < maxH + offY) {
+				Tile tile = getFg(change.x, change.y);
+				if(tile != null) {
+					g2d.drawImage(tile.getTexture(), null, (change.x - offX) * TILESIZE, (change.y - offY) * TILESIZE);
+				}
+			}
+		}
+		fgChanges.clear();
 	}
 	
 	// Generation
@@ -191,7 +235,27 @@ public class Level {
 	public void setSpawnpoint(Point spawnpoint) {
 		this.spawnpoint = spawnpoint;
 	}
+
+	public void setNeedsRedraw(boolean needsRedraw) {
+		this.needsRedraw = needsRedraw;
+	}
+
+	public boolean getNeedsRedraw() {
+		return needsRedraw;
+	}
 	
-	
+	class TileChange {
+		public int x;
+		public int y;
+		public short id;
+		public boolean fg;
+		
+		public TileChange(int x, int y, short id, boolean fg) {
+			this.x = x;
+			this.y = y;
+			this.id = id;
+			this.fg = fg;
+		}
+	}
 	
 }

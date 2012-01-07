@@ -68,18 +68,25 @@ public class Player {
 			if(w && !a && !d && position.y > 0 && !level.getFg(position.x, position.y-1).isSolid()) {
 				position.y--;
 				levelDelta.y--;
+				level.setNeedsRedraw(true);
 			}
 			else if(s && !a && !d && position.y < level.getHeight()-1 && !level.getFg(position.x, position.y+1).isSolid()) {
 				position.y++;
 				levelDelta.y++;
+				level.setNeedsRedraw(true);
+
 			}
 			else if(a && !w && !s && position.x > 0 && !level.getFg(position.x-1, position.y).isSolid()) {
 				position.x--;
 				levelDelta.x--;
+				level.setNeedsRedraw(true);
+
 			}
 			else if(d && !w && !s && position.x < level.getWidth()-1 && !level.getFg(position.x+1, position.y).isSolid()) {
 				position.x++;
 				levelDelta.x++;
+				level.setNeedsRedraw(true);
+
 			}
 		// Placement
 		if(input.keyDownOnce(KeyEvent.VK_F)) {

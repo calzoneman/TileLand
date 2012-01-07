@@ -1,19 +1,23 @@
 package net.calzoneman.TileLand;
 
 import java.awt.Point;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-public class InputHandler implements MouseListener, MouseMotionListener, KeyListener {
+public class InputHandler implements MouseListener, MouseMotionListener, KeyListener, FocusListener {
 	
 	private enum ButtonState {
 		PRESSED,
 		ONCE,
 		RELEASED
 	}
+	
+	private boolean focused = false;
 	
 	// Mouse
 	private final int NUM_BUTTONS = 3;
@@ -69,6 +73,7 @@ public class InputHandler implements MouseListener, MouseMotionListener, KeyList
 	}
 	
 	public synchronized void poll() {
+		if(!focused) return;
 		// Mouse
 		this.pollDelta = new Point(currentPos.x - pollPos.x, currentPos.y - pollPos.y);
 		this.pollPos = new Point(currentPos);
@@ -184,5 +189,25 @@ public class InputHandler implements MouseListener, MouseMotionListener, KeyList
 			this.kState[keyCode] = true;
 		}
 	}
+
+	@Override
+	public void focusGained(FocusEvent e) {
+		this.focused = true;
+	}
+
+	@Override
+	public void focusLost(FocusEvent e) {
+		this.focused = false;
+	}
+
+	public boolean isFocused() {
+		return focused;
+	}
+
+	public void setFocused(boolean focused) {
+		this.focused = focused;
+	}
+	
+	
 
 }

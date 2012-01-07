@@ -1,6 +1,13 @@
 package net.calzoneman.TileLand;
 
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfigTemplate;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,7 +31,13 @@ public class TileDefinitions {
 		fgdefs = new HashMap<Short, Tile>();
 		try {
 			System.out.println(new File(".").getAbsolutePath());
-			textures = ImageIO.read(new File("res/textures.png"));
+			BufferedImage raw = ImageIO.read(new File("res/textures.png"));
+			// Convert the image to an efficient format
+		    GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+			textures = config.createCompatibleImage(raw.getWidth(), raw.getHeight(), Transparency.TRANSLUCENT);
+			Graphics2D g2d = (Graphics2D)textures.getGraphics();
+			g2d.drawImage(raw, null, 0, 0);
+			g2d.dispose();
 		}
 		catch(IOException ex) {
 			System.err.println("Unable to load textures");
