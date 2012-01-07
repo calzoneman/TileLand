@@ -3,6 +3,7 @@ package net.calzoneman.TileLand;
 import java.awt.AWTException;
 import java.awt.BufferCapabilities;
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -10,6 +11,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -130,8 +132,8 @@ public class TileLand {
 			g.fillRect(0, 0, screen.getWidth(), screen.getHeight());
 			render(g, ply, ticks);
 			double rDiff = (System.nanoTime() - rStart) / 1000000.0;
-			char[] fpsString = ("FPS: " + 1000.0/rDiff).toCharArray();
-			g.drawChars(fpsString, 0, fpsString.length, 0, 10);
+			String fpsString = ("FPS: " + (int)(1000.0/rDiff));
+			drawString(g, fpsString, 0, 0, Color.WHITE, Color.BLACK);
 			g.dispose();
 			bufStrategy.show();
 			if(System.currentTimeMillis() - lastLog > 1000) {
@@ -183,7 +185,21 @@ public class TileLand {
 			}
 			g2d.drawRect(mPos.x, mPos.y, level.TILESIZE, level.TILESIZE);
 			g2d.drawImage(ply.getSprite(), null, ply.getOffsetPosition().x * level.TILESIZE, ply.getOffsetPosition().y * level.TILESIZE);
-			g2d.drawChars(ply.getName().toCharArray(), 0, ply.getName().length(), ply.getOffsetPosition().x * level.TILESIZE, ply.getOffsetPosition().y * level.TILESIZE - 10);
+			int x = (int)((ply.getOffsetPosition().x + .5) * level.TILESIZE) - (int)getStringBounds(g, ply.getName()).getWidth() / 2;
+			int y = ply.getOffsetPosition().y * level.TILESIZE - (int)getStringBounds(g, ply.getName()).getHeight();
+			drawString(g, ply.getName(), x, y, Color.BLACK, Color.WHITE);
 	}
 
+	public Rectangle2D getStringBounds(Graphics g, String str) {
+		return g.getFontMetrics().getStringBounds(str, g);
+	}
+	
+	public void drawString(Graphics g, String str, int x, int y, Color fg, Color bg) {
+		FontMetrics fm = g.getFontMetrics();
+		Rectangle2D bounds = fm.getStringBounds(str, g);
+		g.setColor(bg);
+		g.fillRect(x, y, (int)bounds.getWidth(), (int)bounds.getHeight());
+		g.setColor(fg);
+		g.drawString(str, x, y + (int)bounds.getHeight());
+	}
 }

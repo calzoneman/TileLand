@@ -19,6 +19,8 @@ public class InputHandler implements MouseListener, MouseMotionListener, KeyList
 	
 	private boolean focused = false;
 	
+	private long lastPollTime;
+	
 	// Mouse
 	private final int NUM_BUTTONS = 3;
 	private boolean[] mState;
@@ -31,8 +33,11 @@ public class InputHandler implements MouseListener, MouseMotionListener, KeyList
 	private final int NUM_KEYS = 256;
 	private boolean[] kState;
 	private ButtonState[] kPollState;
+	private long[] kTime;
 	
 	public InputHandler() {
+		this.lastPollTime = 0;
+		
 		// Mouse
 		this.mState = new boolean[NUM_BUTTONS];
 		this.mPollState = new ButtonState[NUM_BUTTONS];
@@ -43,6 +48,7 @@ public class InputHandler implements MouseListener, MouseMotionListener, KeyList
 		// Keyboard
 		this.kState = new boolean[NUM_KEYS];
 		this.kPollState = new ButtonState[NUM_KEYS];
+		this.kTime = new long[NUM_KEYS];
 		
 		// Initialize states
 		for(int i = 0; i < NUM_BUTTONS; i++) {
@@ -53,6 +59,7 @@ public class InputHandler implements MouseListener, MouseMotionListener, KeyList
 		for(int i = 0; i < NUM_KEYS; i++) {
 			kState[i] = false;
 			kPollState[i] = ButtonState.RELEASED;
+			kTime[i] = 0;
 		}
 	}
 	
@@ -105,7 +112,15 @@ public class InputHandler implements MouseListener, MouseMotionListener, KeyList
 			else {
 				kPollState[i] = ButtonState.RELEASED;
 			}
+			
+			if(keyDown(i)) {
+				kTime[i] += System.currentTimeMillis() - lastPollTime;
+			}
+			else {
+				kTime[i] = 0;
+			}
 		}
+		lastPollTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -160,6 +175,13 @@ public class InputHandler implements MouseListener, MouseMotionListener, KeyList
 	public boolean keyDownOnce(int keyCode) {
 		if(keyCode >= 0 && keyCode < NUM_KEYS) {
 			return this.kPollState[keyCode] == ButtonState.ONCE;
+		}
+		return false;
+	}
+	
+	public boolean keyHeld(int keyCode) {
+		if(keyCode >= 0 && keyCode < NUM_KEYS) {
+			return this.kTime[keyCode] > 333;
 		}
 		return false;
 	}

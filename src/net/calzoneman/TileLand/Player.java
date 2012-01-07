@@ -16,6 +16,8 @@ public class Player {
 	private Level level;
 	private BufferedImage sprite;
 	private InputHandler input;
+	private long lastMoveTime;
+	private int lastKey;
 	private Tile currentFgTile;
 	private Tile currentBgTile;
 	private boolean editingFg;
@@ -43,6 +45,8 @@ public class Player {
 		this.currentBgTile = TileDefinitions.getBg(TileTypes.FG_TREE1);
 		this.editingFg = false;
 		this.setLevelDelta(new Point(0, 0));
+		this.lastMoveTime = 0;
+		this.lastKey = 0;
 	}
 	
 	public void loadDefaultSprite() {
@@ -61,37 +65,60 @@ public class Player {
 			level.save();
 			return;
 		}
+		/*if(input.keyDownOnce(KeyEvent.VK_W))lastKey = KeyEvent.VK_W; 
+		else if(input.keyDownOnce(KeyEvent.VK_S))lastKey = KeyEvent.VK_S; 
+		else if(input.keyDownOnce(KeyEvent.VK_A))lastKey = KeyEvent.VK_A; 
+		else if(input.keyDownOnce(KeyEvent.VK_D))lastKey = KeyEvent.VK_D;
+		else lastKey = 0;*/
 		// Movement
 			boolean w = false, s = false, a = false, d = false;
-			if(input.keyDownOnce(KeyEvent.VK_W)) w = true;
-			else if(input.keyDownOnce(KeyEvent.VK_S)) s = true;
-			else if(input.keyDownOnce(KeyEvent.VK_A)) a = true;
-			else if(input.keyDownOnce(KeyEvent.VK_D)) d = true;
+			if(input.keyDownOnce(KeyEvent.VK_W) || (
+					input.keyHeld(KeyEvent.VK_W) && lastKey == KeyEvent.VK_W)) {
+				w = true;
+			}
+			else if(input.keyDownOnce(KeyEvent.VK_S) || (
+					input.keyHeld(KeyEvent.VK_S) && lastKey == KeyEvent.VK_S)) {
+				s = true;
+			}
+			else if(input.keyDownOnce(KeyEvent.VK_A) || (
+					input.keyHeld(KeyEvent.VK_A) && lastKey == KeyEvent.VK_A)) {
+				a = true;
+			}
+			else if(input.keyDownOnce(KeyEvent.VK_D) || (
+					input.keyHeld(KeyEvent.VK_D) && lastKey == KeyEvent.VK_D)) {
+				d = true;
+			}
 			
 			// Hit detection
 			if(w && !a && !d && position.y > 0 && !level.getFg(position.x, position.y-1).isSolid()) {
 				position.y--;
 				levelDelta.y--;
 				level.setNeedsRedraw(true);
+				lastMoveTime = System.currentTimeMillis();
+				lastKey = KeyEvent.VK_W;
 			}
 			else if(s && !a && !d && position.y < level.getHeight()-1 && !level.getFg(position.x, position.y+1).isSolid()) {
 				position.y++;
 				levelDelta.y++;
 				level.setNeedsRedraw(true);
-
+				lastMoveTime = System.currentTimeMillis();
+				lastKey = KeyEvent.VK_S;
 			}
 			else if(a && !w && !s && position.x > 0 && !level.getFg(position.x-1, position.y).isSolid()) {
 				position.x--;
 				levelDelta.x--;
 				level.setNeedsRedraw(true);
-
+				lastMoveTime = System.currentTimeMillis();
+				lastKey = KeyEvent.VK_A;
 			}
 			else if(d && !w && !s && position.x < level.getWidth()-1 && !level.getFg(position.x+1, position.y).isSolid()) {
 				position.x++;
 				levelDelta.x++;
 				level.setNeedsRedraw(true);
-
+				lastMoveTime = System.currentTimeMillis();
+				lastKey = KeyEvent.VK_D;
 			}
+			
 		// Placement
 		if(input.keyDownOnce(KeyEvent.VK_F)) {
 			this.editingFg = !this.editingFg;
