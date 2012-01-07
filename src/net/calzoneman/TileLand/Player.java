@@ -57,6 +57,10 @@ public class Player {
 	
 	public void handleInput() {
 		if(input == null) return;
+		if(input.keyDown(KeyEvent.VK_CONTROL) && input.keyDownOnce(KeyEvent.VK_S)) {
+			level.save();
+			return;
+		}
 		// Movement
 			boolean w = false, s = false, a = false, d = false;
 			if(input.keyDownOnce(KeyEvent.VK_W)) w = true;
@@ -117,7 +121,7 @@ public class Player {
 			mPos.y = mPos.y / level.TILESIZE + levelDelta.y;
 			
 			if(editingFg) {
-				if(mPos.x != position.x && mPos.y != position.y) {
+				if(!(mPos.x == position.x && mPos.y == position.y)) {
 					level.setFg(mPos.x, mPos.y, currentFgTile);
 				}
 			}

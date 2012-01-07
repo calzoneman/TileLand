@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import javax.swing.JFrame;
 
@@ -66,8 +67,13 @@ public class TileLand {
 		long lastLog = System.currentTimeMillis();
 		double unprocessed = 0;
 		long ticks = 0;
-		level = new Level(64, 64);
-		level.save();
+		if(new File("saves/save.tl").exists()) {
+			level = new Level("save.tl");
+		}
+		else {
+			level = new Level(512, 512);
+		}
+		//level.save();
 		Point accumDelta = new Point(0, 0); // In pixels, accumulates deltas from input handler
 		
 		ply = new Player("Player", level, new Point(1, 1), input);

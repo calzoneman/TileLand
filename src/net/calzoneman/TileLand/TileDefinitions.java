@@ -44,6 +44,7 @@ public class TileDefinitions {
 		}
 		if(textures != null) {
 			// Format: defs.put(id, new Tile(id, name, texture, isForeground));
+			bgdefs.put((short) -1000, new Tile((short)-1000, "VOID", textures.getSubimage(128, 2528, 32, 32), false, TileProperties.SOLID));
 			bgdefs.put(TileTypes.BG_GRASS1, new Tile(TileTypes.BG_GRASS1, "Grass1", textures.getSubimage(64, 0, 32, 32), false));
 			bgdefs.put(TileTypes.BG_GRASS2, new Tile(TileTypes.BG_GRASS2, "Grass2", textures.getSubimage(96, 0, 32, 32), false));
 			bgdefs.put(TileTypes.BG_GRASS3, new Tile(TileTypes.BG_GRASS3, "Grass3", textures.getSubimage(128, 0, 32, 32), false));

@@ -8,25 +8,31 @@ import java.awt.Point;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
 public class Level {
-	public static final int HEADER_SIZE = 4;
+	public static final int HEADER_SIZE = 20;
 	public static final int TILESIZE = 32;
+	public static final int DRAWN_MAX_WIDTH = 1920;
+	public static final int DRAWN_MAX_HEIGHT = 1080;
 	
 	private Random rand;
 	
 	private int width = 0;
 	private int height = 0;
 	
-	private Point spawnpoint;
+	private Point spawnpoint = new Point(0, 0);
 	
 	private short[] bgTiles;
 	private short[] fgTiles;
 	
-	public String name = "untitled level";
+	public String name = "save";
 	
 	private boolean needsRedraw = true;
 	private ArrayList<TileChange> fgChanges;
@@ -45,7 +51,9 @@ public class Level {
 		this.height = height;
 		this.generate(width, height);
 		GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-		drawn = config.createCompatibleImage(width * TILESIZE, height * TILESIZE, Transparency.TRANSLUCENT);
+		int w = (width * TILESIZE < DRAWN_MAX_WIDTH ? width * TILESIZE : DRAWN_MAX_WIDTH);
+		int h = (height * TILESIZE < DRAWN_MAX_HEIGHT ? height * TILESIZE : DRAWN_MAX_HEIGHT);
+		drawn = config.createCompatibleImage(w, h, Transparency.TRANSLUCENT);
 	}
 	
 	public Level(int width, int height, String name) {
@@ -54,15 +62,82 @@ public class Level {
 	}
 	
 	public Level(String fname) {
+		this();
 		this.load(fname);
+		GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+		int w = (width * TILESIZE < DRAWN_MAX_WIDTH ? width * TILESIZE : DRAWN_MAX_WIDTH);
+		int h = (height * TILESIZE < DRAWN_MAX_HEIGHT ? height * TILESIZE : DRAWN_MAX_HEIGHT);
+		drawn = config.createCompatibleImage(w, h, Transparency.TRANSLUCENT);
 	}
 
 	public void save() {
+		File savefile = new File("saves/" + name + ".tl");
+		try {
+			if(!(new File("saves").exists())) new File("saves").mkdir();
+			FileOutputStream fos = new FileOutputStream(savefile);
+			ByteBuffer buf = ByteBuffer.allocate(HEADER_SIZE + width * height * 4);
+			buf.putInt(0x4F07E6C8);
+			buf.putInt(width);
+			buf.putInt(height);
+			buf.putInt(spawnpoint.x);
+			buf.putInt(spawnpoint.y);
+			for(short s : bgTiles) {
+				buf.putShort(s);
+			}
+			for(short s : fgTiles) {
+				buf.putShort(s);
+			}
+			fos.write(buf.array());
+			fos.close();
+			buf = null;
+			System.gc();
+		}
+		catch(IOException ex) {
+			System.err.println("Unable to save level!");
+		}
 		
 	}
 	
 	public void load(String filename) {
-		
+		File savefile = new File("saves/" + filename);
+		if(!savefile.exists()) {
+			System.err.println("Savefile doesn't exist!");
+			return;
+		}
+		try {
+			FileInputStream fis = new FileInputStream(savefile);
+			byte[] hdr = new byte[HEADER_SIZE];
+			fis.read(hdr, 0, HEADER_SIZE);
+			ByteBuffer hdrbuf = ByteBuffer.wrap(hdr);
+			if(hdrbuf.getInt() != 0x4F07E6C8) {
+				System.err.println("Wrong magic number in level!");
+				return;
+			}
+			this.width = hdrbuf.getInt();
+			this.height = hdrbuf.getInt();
+			this.spawnpoint = new Point(hdrbuf.getInt(), hdrbuf.getInt());
+			ByteBuffer databuf = ByteBuffer.allocate(width * height * 4);
+			fis.getChannel().read(databuf);
+			fis.close();
+			databuf.rewind();
+			
+			bgTiles = new short[width * height];
+			fgTiles = new short[width * height];
+			for(int i = 0; i < width * height; i++) {
+				bgTiles[i] = databuf.getShort();
+			}
+			for(int i = 0; i < width * height; i++) {
+				fgTiles[i] = databuf.getShort();
+			}
+			databuf.clear();
+			databuf = null;
+			System.gc();
+			//generate(width, height);
+			this.name = filename.substring(0, filename.indexOf(".tl"));
+		}
+		catch(IOException ex) {
+			System.err.println("Unable to load level!");
+		}
 	}
 	
 	// Tile getters/setters
@@ -132,7 +207,7 @@ public class Level {
 	}
 	public void redraw(Graphics g, int offX, int offY, int maxW, int maxH) {
 		Graphics2D g2d = (Graphics2D)drawn.getGraphics();
-		g2d.fillRect(0, 0, width * TILESIZE, height * TILESIZE);
+		g2d.clearRect(0, 0, width * TILESIZE, height * TILESIZE);
 		for(int i = offX; i < width && i < maxW + offX; i++) {
 			for(int j = offY; j < height && j < maxH + offY; j++) {
 				Tile bg = getBg(i, j);
