@@ -25,7 +25,7 @@ public class TileDefinitions {
 	public static final Tile NULLBGTILE = new Tile((short)-1, "NULL TILE", null, false, TileProperties.SOLID);
 	public static final Tile NULLFGTILE = new Tile((short)-1, "NULL FG TILE", null, true);
 	
-	static {
+	public static void init() {
 		BufferedImage textures = null;
 		bgdefs = new HashMap<Short, Tile>();
 		fgdefs = new HashMap<Short, Tile>();

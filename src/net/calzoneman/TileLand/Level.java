@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -81,11 +82,11 @@ public class Level {
 			buf.putInt(height);
 			buf.putInt(spawnpoint.x);
 			buf.putInt(spawnpoint.y);
-			for(short s : bgTiles) {
-				buf.putShort(s);
+			for(int i = 0; i < width * height; i++) {
+				buf.putShort(bgTiles[i]);
 			}
-			for(short s : fgTiles) {
-				buf.putShort(s);
+			for(int i = 0; i < width * height; i++) {
+				buf.putShort(fgTiles[i]);
 			}
 			fos.write(buf.array());
 			fos.close();
@@ -106,9 +107,9 @@ public class Level {
 		}
 		try {
 			FileInputStream fis = new FileInputStream(savefile);
-			byte[] hdr = new byte[HEADER_SIZE];
-			fis.read(hdr, 0, HEADER_SIZE);
-			ByteBuffer hdrbuf = ByteBuffer.wrap(hdr);
+			ByteBuffer hdrbuf = ByteBuffer.allocate(HEADER_SIZE);
+			fis.getChannel().read(hdrbuf);
+			hdrbuf.rewind();
 			if(hdrbuf.getInt() != 0x4F07E6C8) {
 				System.err.println("Wrong magic number in level!");
 				return;
@@ -121,21 +122,17 @@ public class Level {
 			fis.close();
 			databuf.rewind();
 			
+			ShortBuffer mapBuf = databuf.asShortBuffer();
 			bgTiles = new short[width * height];
 			fgTiles = new short[width * height];
-			for(int i = 0; i < width * height; i++) {
-				bgTiles[i] = databuf.getShort();
-			}
-			for(int i = 0; i < width * height; i++) {
-				fgTiles[i] = databuf.getShort();
-			}
-			databuf.clear();
-			databuf = null;
-			System.gc();
-			//generate(width, height);
+			mapBuf.get(bgTiles);
+			mapBuf.get(fgTiles);
 			this.name = filename.substring(0, filename.indexOf(".tl"));
 		}
 		catch(IOException ex) {
+			System.err.println("Unable to load level!");
+		}
+		catch(Exception ex) {
 			System.err.println("Unable to load level!");
 		}
 	}
