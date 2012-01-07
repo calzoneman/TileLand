@@ -93,7 +93,7 @@ public class Player {
 			this.editingFg = !this.editingFg;
 		}
 		
-		if(input.keyDownOnce(KeyEvent.VK_ENTER)) {
+		if(input.keyDownOnce(KeyEvent.VK_E)) {
 			if(editingFg && TileDefinitions.getFg(currentFgTile.getId() + 1) != TileDefinitions.NULLFGTILE) {
 				currentFgTile = TileDefinitions.getFg(currentFgTile.getId() + 1);
 			}
@@ -101,7 +101,7 @@ public class Player {
 				currentBgTile = TileDefinitions.getBg(currentBgTile.getId() + 1);
 			}
 		}
-		else if(input.keyDownOnce(KeyEvent.VK_SHIFT)) {
+		else if(input.keyDownOnce(KeyEvent.VK_Q)) {
 			if(editingFg && TileDefinitions.getFg(currentFgTile.getId() - 1) != TileDefinitions.NULLFGTILE) {
 				currentFgTile = TileDefinitions.getFg(currentFgTile.getId() - 1);
 			}
@@ -115,8 +115,11 @@ public class Player {
 			Point mPos = input.getMousePosition();
 			mPos.x = mPos.x / level.TILESIZE + levelDelta.x;
 			mPos.y = mPos.y / level.TILESIZE + levelDelta.y;
+			
 			if(editingFg) {
-				level.setFg(mPos.x, mPos.y, currentFgTile);
+				if(mPos.x != position.x && mPos.y != position.y) {
+					level.setFg(mPos.x, mPos.y, currentFgTile);
+				}
 			}
 			else {
 				level.setBg(mPos.x, mPos.y, currentBgTile);
@@ -180,7 +183,7 @@ public class Player {
 	}
 	
 	public boolean canPlace(Point p) {
-		if(p.x == position.x && p.y == position.y) {
+		if(p.x == position.x && p.y == position.y && editingFg) {
 			return false;
 		}
 		if(p.x < 0 || p.x >= level.getWidth() || p.y < 0 || p.y >= level.getHeight()) {

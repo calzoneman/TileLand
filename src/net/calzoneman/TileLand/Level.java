@@ -152,18 +152,22 @@ public class Level {
 		Graphics2D g2d = (Graphics2D)drawn.getGraphics();
 		for(TileChange change : bgChanges) {
 			if(change.x >= offX && change.x < maxW + offX && change.y >= offY && change.y < maxH + offY) {
-				Tile tile = getBg(change.x, change.y);
-				if(tile != null) {
-					g2d.drawImage(tile.getTexture(), null, (change.x) * TILESIZE, (offY) * TILESIZE);
+				Tile bg = getBg(change.x, change.y);
+				Tile fg = getFg(change.x, change.y);
+				if(bg != null && fg != null) {
+					g2d.drawImage(bg.getTexture(), null, (change.x - offX) * TILESIZE, (change.y - offY) * TILESIZE);
+					g2d.drawImage(fg.getTexture(), null, (change.x - offX) * TILESIZE, (change.y - offY) * TILESIZE);
 				}
 			}
 		}
 		bgChanges.clear();
 		for(TileChange change : fgChanges) {
 			if(change.x >= offX && change.x < maxW + offX && change.y >= offY && change.y < maxH + offY) {
-				Tile tile = getFg(change.x, change.y);
-				if(tile != null) {
-					g2d.drawImage(tile.getTexture(), null, (change.x - offX) * TILESIZE, (change.y - offY) * TILESIZE);
+				Tile bg = getBg(change.x, change.y);
+				Tile fg = getFg(change.x, change.y);
+				if(fg != null && bg != null) {
+					g2d.drawImage(bg.getTexture(), null, (change.x - offX) * TILESIZE, (change.y - offY) * TILESIZE);
+					g2d.drawImage(fg.getTexture(), null, (change.x - offX) * TILESIZE, (change.y - offY) * TILESIZE);
 				}
 			}
 		}

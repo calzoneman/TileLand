@@ -48,6 +48,17 @@ public class TileDefinitions {
 			bgdefs.put(TileTypes.BG_GRASS2, new Tile(TileTypes.BG_GRASS2, "Grass2", textures.getSubimage(96, 0, 32, 32), false));
 			bgdefs.put(TileTypes.BG_GRASS3, new Tile(TileTypes.BG_GRASS3, "Grass3", textures.getSubimage(128, 0, 32, 32), false));
 			bgdefs.put(TileTypes.BG_GRASS4, new Tile(TileTypes.BG_GRASS4, "Grass4", textures.getSubimage(160, 0, 32, 32), false));
+			bgdefs.put(TileTypes.BG_SAND_TLCORNER, new Tile(TileTypes.BG_SAND_TLCORNER, "SandTopLeftCorner", textures.getSubimage(96, 3264, 32, 32), false));
+			bgdefs.put(TileTypes.BG_SAND_TMIDDLE, new Tile(TileTypes.BG_SAND_TMIDDLE, "SandTopMiddle", textures.getSubimage(128, 3264, 32, 32), false));
+			bgdefs.put(TileTypes.BG_SAND_TRCORNER, new Tile(TileTypes.BG_SAND_TRCORNER, "SandTopRightCorner", textures.getSubimage(160, 3264, 32, 32), false));
+			bgdefs.put(TileTypes.BG_SAND_MLEFT, new Tile(TileTypes.BG_SAND_MLEFT, "SandMiddleLeft", textures.getSubimage(96, 3296, 32, 32), false));
+			bgdefs.put(TileTypes.BG_SAND_MMIDDLE, new Tile(TileTypes.BG_SAND_MMIDDLE, "SandMiddleMiddle", textures.getSubimage(128, 3296, 32, 32), false));
+			bgdefs.put(TileTypes.BG_SAND_MRIGHT, new Tile(TileTypes.BG_SAND_MRIGHT, "SandMiddleRight", textures.getSubimage(160, 3296, 32, 32), false));
+			bgdefs.put(TileTypes.BG_SAND_BLCORNER, new Tile(TileTypes.BG_SAND_BLCORNER, "SandBottomLeftCorner", textures.getSubimage(96, 3328, 32, 32), false));
+			bgdefs.put(TileTypes.BG_SAND_BMIDDLE, new Tile(TileTypes.BG_SAND_BMIDDLE, "SandBottomMiddle", textures.getSubimage(128, 3328, 32, 32), false));
+			bgdefs.put(TileTypes.BG_SAND_BRCORNER, new Tile(TileTypes.BG_SAND_BRCORNER, "SandBottomRightCorner", textures.getSubimage(160, 3328, 32, 32), false));
+			bgdefs.put(TileTypes.BG_GRASS_WTF, new Tile(TileTypes.BG_GRASS_WTF, "GrassWtf", textures.getSubimage(32, 32, 32, 32), false));
+
 			
 			fgdefs.put(TileTypes.FG_TREE1, new Tile(TileTypes.FG_TREE1, "Tree1" , textures.getSubimage(32, 128, 32, 32), true, TileProperties.SOLID));
 			fgdefs.put(TileTypes.FG_TREE2, new Tile(TileTypes.FG_TREE2, "Tree2" , textures.getSubimage(64, 128, 32, 32), true, TileProperties.SOLID));
@@ -56,6 +67,11 @@ public class TileDefinitions {
 			fgdefs.put(TileTypes.FG_SIGN3, new Tile(TileTypes.FG_SIGN3, "Sign3", textures.getSubimage(192, 128, 32, 32), true, TileProperties.SOLID));
 			fgdefs.put(TileTypes.FG_ROCK1, new Tile(TileTypes.FG_ROCK1, "Rock1", textures.getSubimage(128, 160, 32, 32), true, TileProperties.SOLID));
 			fgdefs.put(TileTypes.FG_ROCK2, new Tile(TileTypes.FG_ROCK2, "Rock2", textures.getSubimage(192, 160, 32, 32), true, TileProperties.SOLID));
+			fgdefs.put(TileTypes.FG_BUSH1, new Tile(TileTypes.FG_BUSH1, "Bush1", textures.getSubimage(224, 0, 32, 32), true, TileProperties.SOLID));
+			fgdefs.put(TileTypes.FG_BUSH1DEAD, new Tile(TileTypes.FG_BUSH1DEAD, "Bush1dead", textures.getSubimage(0, 64, 32, 32), true, TileProperties.SOLID));
+			fgdefs.put(TileTypes.FG_BUSH2, new Tile(TileTypes.FG_BUSH2, "Bush2", textures.getSubimage(96, 128, 32, 32), true, TileProperties.SOLID));
+			fgdefs.put(TileTypes.FG_ROCK3, new Tile(TileTypes.FG_ROCK3, "Rock3", textures.getSubimage(32, 288, 32, 32), true, TileProperties.SOLID));
+			fgdefs.put(TileTypes.FG_EGGTHING, new Tile(TileTypes.FG_EGGTHING, "Eggthing", textures.getSubimage(224, 320, 32, 32), true, TileProperties.SOLID));
 			
 			DEFAULTBG = bgdefs.get(TileTypes.BG_GRASS1);
 			DEFAULTFG = NULLFGTILE;

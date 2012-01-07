@@ -149,8 +149,6 @@ public class TileLand {
 			level.render(g, renderDelta.x, renderDelta.y, screen.getWidth() / level.TILESIZE, screen.getHeight() / level.TILESIZE);
 		}
 		Graphics2D g2d = (Graphics2D)g;
-		g2d.drawImage(ply.getSprite(), null, ply.getOffsetPosition().x * level.TILESIZE, ply.getOffsetPosition().y * level.TILESIZE);
-		g2d.drawChars(ply.getName().toCharArray(), 0, ply.getName().length(), ply.getOffsetPosition().x * level.TILESIZE, ply.getOffsetPosition().y * level.TILESIZE - 10);
 		// Render player's current tile
 			Point mPos = input.getMousePosition();
 			boolean canPlace = ply.canPlace(new Point(mPos.x / level.TILESIZE + renderDelta.x, mPos.y / level.TILESIZE + renderDelta.y));
@@ -178,6 +176,8 @@ public class TileLand {
 				g2d.drawImage(im, null, mPos.x, mPos.y);
 			}
 			g2d.drawRect(mPos.x, mPos.y, level.TILESIZE, level.TILESIZE);
+			g2d.drawImage(ply.getSprite(), null, ply.getOffsetPosition().x * level.TILESIZE, ply.getOffsetPosition().y * level.TILESIZE);
+			g2d.drawChars(ply.getName().toCharArray(), 0, ply.getName().length(), ply.getOffsetPosition().x * level.TILESIZE, ply.getOffsetPosition().y * level.TILESIZE - 10);
 	}
 
 }
