@@ -24,6 +24,7 @@ public class TileDefinitions {
 	public static Tile DEFAULTFG;
 	public static final Tile NULLBGTILE = new Tile((short)-1, "NULL TILE", null, false, TileProperties.SOLID);
 	public static final Tile NULLFGTILE = new Tile((short)-1, "NULL FG TILE", null, true);
+	public static BufferedImage VOIDTEXTURE;
 	
 	public static void init() {
 		BufferedImage textures = null;
@@ -44,7 +45,7 @@ public class TileDefinitions {
 		}
 		if(textures != null) {
 			// Format: defs.put(id, new Tile(id, name, texture, isForeground));
-			bgdefs.put((short) -1000, new Tile((short)-1000, "VOID", textures.getSubimage(128, 2528, 32, 32), false, TileProperties.SOLID));
+			VOIDTEXTURE = textures.getSubimage(128, 2528, 32, 32);
 			bgdefs.put(TileTypes.BG_GRASS1, new Tile(TileTypes.BG_GRASS1, "Grass1", textures.getSubimage(64, 0, 32, 32), false));
 			bgdefs.put(TileTypes.BG_GRASS2, new Tile(TileTypes.BG_GRASS2, "Grass2", textures.getSubimage(96, 0, 32, 32), false));
 			bgdefs.put(TileTypes.BG_GRASS3, new Tile(TileTypes.BG_GRASS3, "Grass3", textures.getSubimage(128, 0, 32, 32), false));
@@ -59,6 +60,15 @@ public class TileDefinitions {
 			bgdefs.put(TileTypes.BG_SAND_BMIDDLE, new Tile(TileTypes.BG_SAND_BMIDDLE, "SandBottomMiddle", textures.getSubimage(128, 3328, 32, 32), false));
 			bgdefs.put(TileTypes.BG_SAND_BRCORNER, new Tile(TileTypes.BG_SAND_BRCORNER, "SandBottomRightCorner", textures.getSubimage(160, 3328, 32, 32), false));
 			bgdefs.put(TileTypes.BG_GRASS_WTF, new Tile(TileTypes.BG_GRASS_WTF, "GrassWtf", textures.getSubimage(32, 32, 32, 32), false));
+			bgdefs.put(TileTypes.BG_LAKE_TLCORNER, new Tile(TileTypes.BG_LAKE_TLCORNER, "LAKETopLeftCorner", textures.getSubimage(96, 3072, 32, 32), false, TileProperties.LIQUID));
+			bgdefs.put(TileTypes.BG_LAKE_TMIDDLE, new Tile(TileTypes.BG_LAKE_TMIDDLE, "LAKETopMiddle", textures.getSubimage(128, 3072, 32, 32), false, TileProperties.LIQUID));
+			bgdefs.put(TileTypes.BG_LAKE_TRCORNER, new Tile(TileTypes.BG_LAKE_TRCORNER, "LAKETopRightCorner", textures.getSubimage(160, 3072, 32, 32), false, TileProperties.LIQUID));
+			bgdefs.put(TileTypes.BG_LAKE_MLEFT, new Tile(TileTypes.BG_LAKE_MLEFT, "LAKEMiddleLeft", textures.getSubimage(96, 3104, 32, 32), false, TileProperties.LIQUID));
+			bgdefs.put(TileTypes.BG_LAKE_MMIDDLE, new Tile(TileTypes.BG_LAKE_MMIDDLE, "LAKEMiddleMiddle", textures.getSubimage(128, 3104, 32, 32), false, TileProperties.LIQUID));
+			bgdefs.put(TileTypes.BG_LAKE_MRIGHT, new Tile(TileTypes.BG_LAKE_MRIGHT, "LAKEMiddleRight", textures.getSubimage(160, 3104, 32, 32), false, TileProperties.LIQUID));
+			bgdefs.put(TileTypes.BG_LAKE_BLCORNER, new Tile(TileTypes.BG_LAKE_BLCORNER, "LAKEBottomLeftCorner", textures.getSubimage(96, 3136, 32, 32), false, TileProperties.LIQUID));
+			bgdefs.put(TileTypes.BG_LAKE_BMIDDLE, new Tile(TileTypes.BG_LAKE_BMIDDLE, "LAKEBottomMiddle", textures.getSubimage(128, 3136, 32, 32), false, TileProperties.LIQUID));
+			bgdefs.put(TileTypes.BG_LAKE_BRCORNER, new Tile(TileTypes.BG_LAKE_BRCORNER, "LAKEBottomRightCorner", textures.getSubimage(160, 3136, 32, 32), false, TileProperties.LIQUID));
 
 			
 			fgdefs.put(TileTypes.FG_TREE1, new Tile(TileTypes.FG_TREE1, "Tree1" , textures.getSubimage(32, 128, 32, 32), true, TileProperties.SOLID));
@@ -73,6 +83,8 @@ public class TileDefinitions {
 			fgdefs.put(TileTypes.FG_BUSH2, new Tile(TileTypes.FG_BUSH2, "Bush2", textures.getSubimage(96, 128, 32, 32), true, TileProperties.SOLID));
 			fgdefs.put(TileTypes.FG_ROCK3, new Tile(TileTypes.FG_ROCK3, "Rock3", textures.getSubimage(32, 288, 32, 32), true, TileProperties.SOLID));
 			fgdefs.put(TileTypes.FG_EGGTHING, new Tile(TileTypes.FG_EGGTHING, "Eggthing", textures.getSubimage(224, 320, 32, 32), true, TileProperties.SOLID));
+			fgdefs.put(TileTypes.FG_TREE3BOTTOM, new Tile(TileTypes.FG_TREE3BOTTOM, "Tree3bottom", textures.getSubimage(192, 608, 32, 32), true, TileProperties.SOLID));
+			fgdefs.put(TileTypes.FG_TREE3TOP, new Tile(TileTypes.FG_TREE3TOP, "Tree3top", textures.getSubimage(192, 576, 32, 32), true));
 			
 			DEFAULTBG = bgdefs.get(TileTypes.BG_GRASS1);
 			DEFAULTFG = NULLFGTILE;

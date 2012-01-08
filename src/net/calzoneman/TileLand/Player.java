@@ -37,7 +37,7 @@ public class Player {
 	
 	public Player(String name, Level lvl, Point initPos, InputHandler input) {
 		this.name = name;
-		this.setPosition(initPos);
+		this.setPosition(new Point(initPos.x, initPos.y));
 		this.level = lvl;
 		this.input = input;
 		loadDefaultSprite();
@@ -141,6 +141,12 @@ public class Player {
 			}
 		}
 		
+		if(input.keyDownOnce(KeyEvent.VK_ENTER)) {
+			level.setSpawnpoint(this.position);
+		}
+		else if(input.keyDownOnce(KeyEvent.VK_R)) {
+			this.setPosition(level.getSpawnpoint());
+		}
 		
 		if(input.mouseButtonDown(1)) {
 			Point mPos = input.getMousePosition();
@@ -190,7 +196,7 @@ public class Player {
 	}
 
 	public void setPosition(Point position) {
-		this.position = position;
+		this.position = new Point(position.x, position.y);
 	}
 
 	public Point getLevelDelta() {

@@ -5,7 +5,10 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.TexturePaint;
 import java.awt.Transparency;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,8 +23,8 @@ import java.util.Random;
 public class Level {
 	public static final int HEADER_SIZE = 20;
 	public static final int TILESIZE = 32;
-	public static final int DRAWN_MAX_WIDTH = 1920;
-	public static final int DRAWN_MAX_HEIGHT = 1080;
+	public static final int DRAWN_MAX_WIDTH = 2560;
+	public static final int DRAWN_MAX_HEIGHT = 1600;
 	
 	private Random rand;
 	
@@ -44,6 +47,7 @@ public class Level {
 		rand = new Random();
 		fgChanges = new ArrayList<TileChange>();
 		bgChanges = new ArrayList<TileChange>();
+		spawnpoint = new Point(0, 0);
 	}
 	
 	public Level(int width, int height) {
@@ -183,6 +187,14 @@ public class Level {
 		if(x < 0 || x >= width || y < 0 || y >= height) {
 			return false;
 		}
+		if(id == TileTypes.FG_TREE3BOTTOM) {
+			if(setFgId(x, y-1, TileTypes.FG_TREE3TOP)) {
+				fgTiles[y * width + x] = id;
+				fgChanges.add(new TileChange(x, y, id, true));
+				return true;
+			}
+			return false;
+		}
 		fgTiles[y * width + x] = id;
 		fgChanges.add(new TileChange(x, y, id, true));
 		return true;
@@ -210,7 +222,6 @@ public class Level {
 				Tile bg = getBg(i, j);
 				Tile fg = getFg(i, j);
 				if(bg != null) {
-					System.out.println((j - offY) * TILESIZE);
 					g2d.drawImage(bg.getTexture(), null, (i - offX) * TILESIZE, (j - offY) * TILESIZE);
 				}
 				if(fg != null) {
@@ -287,6 +298,12 @@ public class Level {
 				}
 			}
 		}
+		
+		this.spawnpoint = new Point(rand.nextInt(width), rand.nextInt(height));
+		while(getFg(spawnpoint.x, spawnpoint.y) != TileDefinitions.NULLFGTILE) {
+			this.spawnpoint = new Point(rand.nextInt(width), rand.nextInt(height));
+		}
+		
 	}
 
 	public int getWidth() {
@@ -310,7 +327,7 @@ public class Level {
 	}
 
 	public void setSpawnpoint(Point spawnpoint) {
-		this.spawnpoint = spawnpoint;
+		this.spawnpoint = new Point(spawnpoint.x, spawnpoint.y);
 	}
 
 	public void setNeedsRedraw(boolean needsRedraw) {

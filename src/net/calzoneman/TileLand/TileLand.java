@@ -9,6 +9,8 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.TexturePaint;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
@@ -44,7 +46,7 @@ public class TileLand {
 	public TileLand(Level lvl, String plyName) {
 		this.input = new InputHandler();
 		this.level = lvl;
-		this.ply = new Player(plyName, level, new Point(1, 1), input);
+		this.ply = new Player(plyName, level, level.getSpawnpoint(), input);
 	}
 	
 	public void run() {
@@ -89,10 +91,10 @@ public class TileLand {
 		if(level == null) level = new Level(512, 512);
 		
 		if(ply == null) {
-			ply = new Player("Player", level, new Point(1, 1), input);
+			ply = new Player("Player", level, level.getSpawnpoint(), input);
 		}
-		ply.setLevelDelta(new Point(ply.getLevelDelta().x - screen.getWidth() / level.TILESIZE / 2,
-				ply.getLevelDelta().y - screen.getHeight() / level.TILESIZE / 2));
+		//ply.setLevelDelta(new Point(ply.getLevelDelta().x - screen.getWidth() / level.TILESIZE / 2,
+		//		ply.getLevelDelta().y - screen.getHeight() / level.TILESIZE / 2));
 		
 		// Main loop
 		while(true) {
@@ -135,15 +137,20 @@ public class TileLand {
 	}
 
 	public void render(Graphics g, Player ply, long ticks) {
-		Level level = ply.getLevel();
-		Point renderDelta = ply.getLevelDelta();
-		if(level != null) {
-			level.render(g, renderDelta.x, renderDelta.y, screen.getWidth() / level.TILESIZE, screen.getHeight() / level.TILESIZE);
-		}
 		Graphics2D g2d = (Graphics2D)g;
+		Level level = ply.getLevel();
+		Point levelDelta = new Point(ply.getPosition().x - screen.getWidth() / level.TILESIZE / 2, 
+									  ply.getPosition().y - screen.getHeight() / level.TILESIZE / 2);
+		if(!(levelDelta.x == ply.getLevelDelta().x && levelDelta.y == ply.getLevelDelta().y)) {
+			ply.setLevelDelta(levelDelta);
+			level.setNeedsRedraw(true);
+		}
+		if(level != null) {
+			level.render(g, levelDelta.x, levelDelta.y, screen.getWidth() / level.TILESIZE, screen.getHeight() / level.TILESIZE);
+		}
 		// Render player's current tile
 			Point mPos = input.getMousePosition();
-			boolean canPlace = ply.canPlace(new Point(mPos.x / level.TILESIZE + renderDelta.x, mPos.y / level.TILESIZE + renderDelta.y));
+			boolean canPlace = ply.canPlace(new Point(mPos.x / level.TILESIZE + levelDelta.x, mPos.y / level.TILESIZE + levelDelta.y));
 			// Round to the nearest TILESIZE
 			mPos.x = (mPos.x / level.TILESIZE) * level.TILESIZE;
 			mPos.y = (mPos.y / level.TILESIZE) * level.TILESIZE;
@@ -166,12 +173,13 @@ public class TileLand {
 				}
 				im2d.fillRect(0, 0, im.getWidth(), im.getHeight());
 				g2d.drawImage(im, null, mPos.x, mPos.y);
+				g2d.drawRect(mPos.x, mPos.y, level.TILESIZE, level.TILESIZE);
 			}
-			g2d.drawRect(mPos.x, mPos.y, level.TILESIZE, level.TILESIZE);
-			g2d.drawImage(ply.getSprite(), null, ply.getOffsetPosition().x * level.TILESIZE, ply.getOffsetPosition().y * level.TILESIZE);
+		// Render player's sprite
+		g2d.drawImage(ply.getSprite(), null, (ply.getOffsetPosition().x) * level.TILESIZE, (ply.getOffsetPosition().y) * level.TILESIZE);
 		// Render player's name
 		int x = (int)((ply.getOffsetPosition().x + .5) * level.TILESIZE) - (int)getStringBounds(g, ply.getName()).getWidth() / 2;
-		int y = ply.getOffsetPosition().y * level.TILESIZE - (int)getStringBounds(g, ply.getName()).getHeight();
+		int y = (ply.getOffsetPosition().y) * level.TILESIZE - (int)getStringBounds(g, ply.getName()).getHeight();
 		drawString(g, ply.getName(), x, y, Color.BLACK, Color.WHITE);
 	}
 
