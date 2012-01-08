@@ -68,8 +68,8 @@ public class TileDefinitions {
 			fgdefs.put(TileTypes.FG_SIGN3, new Tile(TileTypes.FG_SIGN3, "Sign3", textures.getSubimage(192, 128, 32, 32), true, TileProperties.SOLID));
 			fgdefs.put(TileTypes.FG_ROCK1, new Tile(TileTypes.FG_ROCK1, "Rock1", textures.getSubimage(128, 160, 32, 32), true, TileProperties.SOLID));
 			fgdefs.put(TileTypes.FG_ROCK2, new Tile(TileTypes.FG_ROCK2, "Rock2", textures.getSubimage(192, 160, 32, 32), true, TileProperties.SOLID));
-			fgdefs.put(TileTypes.FG_BUSH1, new Tile(TileTypes.FG_BUSH1, "Bush1", textures.getSubimage(224, 0, 32, 32), true, TileProperties.SOLID));
-			fgdefs.put(TileTypes.FG_BUSH1DEAD, new Tile(TileTypes.FG_BUSH1DEAD, "Bush1dead", textures.getSubimage(0, 64, 32, 32), true, TileProperties.SOLID));
+			fgdefs.put(TileTypes.FG_BUSH1, new Tile(TileTypes.FG_BUSH1, "Bush1", textures.getSubimage(224, 0, 32, 32), true));
+			fgdefs.put(TileTypes.FG_BUSH1DEAD, new Tile(TileTypes.FG_BUSH1DEAD, "Bush1dead", textures.getSubimage(0, 64, 32, 32), true));
 			fgdefs.put(TileTypes.FG_BUSH2, new Tile(TileTypes.FG_BUSH2, "Bush2", textures.getSubimage(96, 128, 32, 32), true, TileProperties.SOLID));
 			fgdefs.put(TileTypes.FG_ROCK3, new Tile(TileTypes.FG_ROCK3, "Rock3", textures.getSubimage(32, 288, 32, 32), true, TileProperties.SOLID));
 			fgdefs.put(TileTypes.FG_EGGTHING, new Tile(TileTypes.FG_EGGTHING, "Eggthing", textures.getSubimage(224, 320, 32, 32), true, TileProperties.SOLID));

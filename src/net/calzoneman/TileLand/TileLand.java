@@ -28,11 +28,23 @@ public class TileLand {
 	
 	public static void main(String[] args) {
 		TileDefinitions.init();
-		new TileLand().run();
+		StartupGUI s = new StartupGUI();
+		while(!s.isReady());
+		Level lvl;
+		if(s.makeNewLevel) lvl = new Level(s.newMapSize.width, s.newMapSize.height, s.selectedMapName);
+		else lvl = new Level(s.selectedMapName);
+		s.dispose();
+		new TileLand(lvl, s.playerName).run();
 	}
 	
 	public TileLand() {
 		
+	}
+	
+	public TileLand(Level lvl, String plyName) {
+		this.input = new InputHandler();
+		this.level = lvl;
+		this.ply = new Player(plyName, level, new Point(1, 1), input);
 	}
 	
 	public void run() {
@@ -40,7 +52,9 @@ public class TileLand {
 		frame = new JFrame("TileLand");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		input = new InputHandler();
+		if(input == null) {
+			input = new InputHandler();
+		}
 		
 		// Set up a rendering canvas
 		screen = new Screen();
@@ -72,14 +86,11 @@ public class TileLand {
 		long lastLog = System.currentTimeMillis();
 		double unprocessed = 0;
 		long ticks = 0;
-		if(new File("saves/save.tl").exists()) {
-			level = new Level("save.tl");
-		}
-		else {
-			level = new Level(512, 512);
-		}
+		if(level == null) level = new Level(512, 512);
 		
-		ply = new Player("Player", level, new Point(1, 1), input);
+		if(ply == null) {
+			ply = new Player("Player", level, new Point(1, 1), input);
+		}
 		ply.setLevelDelta(new Point(ply.getLevelDelta().x - screen.getWidth() / level.TILESIZE / 2,
 				ply.getLevelDelta().y - screen.getHeight() / level.TILESIZE / 2));
 		

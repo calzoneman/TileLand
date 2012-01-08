@@ -52,8 +52,8 @@ public class Level {
 		this.height = height;
 		this.generate(width, height);
 		GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-		int w = (width * TILESIZE < DRAWN_MAX_WIDTH ? width * TILESIZE : DRAWN_MAX_WIDTH);
-		int h = (height * TILESIZE < DRAWN_MAX_HEIGHT ? height * TILESIZE : DRAWN_MAX_HEIGHT);
+		int w = DRAWN_MAX_WIDTH; //(width * TILESIZE < DRAWN_MAX_WIDTH ? width * TILESIZE : DRAWN_MAX_WIDTH);
+		int h = DRAWN_MAX_HEIGHT; //(height * TILESIZE < DRAWN_MAX_HEIGHT ? height * TILESIZE : DRAWN_MAX_HEIGHT);
 		drawn = config.createCompatibleImage(w, h, Transparency.TRANSLUCENT);
 	}
 	
@@ -204,12 +204,13 @@ public class Level {
 	}
 	public void redraw(Graphics g, int offX, int offY, int maxW, int maxH) {
 		Graphics2D g2d = (Graphics2D)drawn.getGraphics();
-		g2d.clearRect(0, 0, width * TILESIZE, height * TILESIZE);
+		g2d.clearRect(0, 0, DRAWN_MAX_WIDTH, DRAWN_MAX_HEIGHT);
 		for(int i = offX; i < width && i < maxW + offX; i++) {
 			for(int j = offY; j < height && j < maxH + offY; j++) {
 				Tile bg = getBg(i, j);
 				Tile fg = getFg(i, j);
 				if(bg != null) {
+					System.out.println((j - offY) * TILESIZE);
 					g2d.drawImage(bg.getTexture(), null, (i - offX) * TILESIZE, (j - offY) * TILESIZE);
 				}
 				if(fg != null) {
