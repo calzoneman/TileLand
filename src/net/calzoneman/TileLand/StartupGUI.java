@@ -117,6 +117,7 @@ public class StartupGUI extends JFrame implements ActionListener, ItemListener, 
 				selectedMapName = newLevelName.getText();
 				playerName = playerNameField.getText();
 				ready = true;
+				System.out.println(ready);
 				setVisible(false);
 			}
 			catch(Exception ex) {

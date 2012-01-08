@@ -31,12 +31,20 @@ public class TileLand {
 	public static void main(String[] args) {
 		TileDefinitions.init();
 		StartupGUI s = new StartupGUI();
-		while(!s.isReady());
+		while(!s.ready) {
+			try {
+				Thread.sleep(50);
+			}
+			catch(Exception e) {
+				
+			}
+		}
+		System.out.println("READY!");
 		Level lvl;
 		if(s.makeNewLevel) lvl = new Level(s.newMapSize.width, s.newMapSize.height, s.selectedMapName);
 		else lvl = new Level(s.selectedMapName);
-		s.dispose();
-		new TileLand(lvl, s.playerName).run();
+		TileLand tl = new TileLand(lvl, s.playerName);
+		tl.run();
 	}
 	
 	public TileLand() {
@@ -50,9 +58,11 @@ public class TileLand {
 	}
 	
 	public void run() {
+		System.out.println("RUN!");
 		// Set up an application frame
 		frame = new JFrame("TileLand");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		System.out.println("FRAME!");
 		
 		if(input == null) {
 			input = new InputHandler();
