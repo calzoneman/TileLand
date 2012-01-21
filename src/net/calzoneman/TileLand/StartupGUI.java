@@ -1,9 +1,6 @@
 package net.calzoneman.TileLand;
 
-import java.awt.Choice;
 import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -17,13 +14,12 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class StartupGUI extends JFrame implements ActionListener, ItemListener, FocusListener {
-	
+	private static final long serialVersionUID = -1522341655379895817L;
 	public String selectedMapName;
 	public boolean makeNewLevel;
 	public Dimension newMapSize;
@@ -34,7 +30,6 @@ public class StartupGUI extends JFrame implements ActionListener, ItemListener, 
 	private JComboBox levelList;
 	private JButton loadLevelBtn;
 	private JButton createLevelBtn;
-	private JCheckBox checkMakeNewLevel;
 	private JTextField newLevelName;
 	private JTextField newLevelWidth;
 	private JTextField newLevelHeight;
@@ -103,7 +98,7 @@ public class StartupGUI extends JFrame implements ActionListener, ItemListener, 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == loadLevelBtn) {
+		if(e.getSource() == loadLevelBtn || e.getSource() == playerNameField) {
 			makeNewLevel = false;
 			selectedMapName = (String)levelList.getSelectedItem();
 			playerName = playerNameField.getText();
