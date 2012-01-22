@@ -142,7 +142,7 @@ public class Player {
 						currentFg = TileTypes.getFgTile(currentFg.getId()-1);
 				}
 				else {
-					if(TileTypes.getBgTile(currentBg.getId()+1) != null) 
+					if(TileTypes.getBgTile(currentBg.getId()-1) != null) 
 						currentBg = TileTypes.getBgTile(currentBg.getId()-1);
 				}
 			}

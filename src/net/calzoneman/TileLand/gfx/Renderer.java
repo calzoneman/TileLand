@@ -6,6 +6,7 @@ import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 import net.calzoneman.TileLand.player.Player;
 import net.calzoneman.TileLand.tile.Tile;
+import net.calzoneman.TileLand.tile.TileOrientation;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -138,7 +139,7 @@ public class Renderer {
 		int ty = (Display.getHeight() - Mouse.getY()) / Level.TILESIZE + renderStart.y;
 		if((tx == ply.getPosition().x && ty == ply.getPosition().y && ply.isEditingFg()) || tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight())
 			col = transparent_red;
-		current = ply.getCurrentTile().getTexPosition();
+		current = ply.getCurrentTile().getTexPosition(TileOrientation.NONE);
 		col.bind();
 		renderMouse(current);
 		
@@ -169,12 +170,12 @@ public class Renderer {
 				if(foreground) {
 					Tile fg = lvl.getFg(i, j);
 					if(fg != null && fg.getId() != -1)
-						renderTextureSubrectangle(tileSheet, fg.getTexPosition(), (i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
+						renderTextureSubrectangle(tileSheet, fg.getTexPosition(TileOrientation.NONE), (i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
 				}
 				else {
 					Tile bg = lvl.getBg(i, j);
 					if(bg != null)
-						renderTextureSubrectangle(tileSheet, bg.getTexPosition(), (i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
+						renderTextureSubrectangle(tileSheet, bg.getTexPosition(lvl.getBgData(i, j)), (i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
 				}
 				
 			}

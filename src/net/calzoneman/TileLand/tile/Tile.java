@@ -1,5 +1,8 @@
 package net.calzoneman.TileLand.tile;
 
+import net.calzoneman.TileLand.level.Level;
+import net.calzoneman.TileLand.level.Location;
+
 import org.newdawn.slick.geom.Rectangle;
 
 
@@ -9,32 +12,31 @@ public class Tile {
 	/** A human readable string identifying the Tile */
 	private String name;
 	/** The rectangle of the tilesheet this Tile will render */
-	private Rectangle texPosition;
+	protected Rectangle texPosition;
 	/** A flags variable comprised of the properties of this Tile */
-	private int properties;
+	protected int properties;
 	
 	/**
 	 * Full constructor for Tile.  Sets all values appropriately.
 	 * @param id The integer id for the Tile
 	 * @param name A human readable name describing the Tile
 	 * @param texPosition The Rectangle that this Tile's texture occupies in the tilesheet texture
-	 * @param properties The properties of the Tile
 	 */
-	public Tile(int id, String name, Rectangle texPosition, int properties) {
+	public Tile(int id, String name, Rectangle texPosition) {
 		this.id = id;
 		this.name = name;
 		this.texPosition = texPosition;
-		this.properties = properties;
+		this.properties = TileProperties.NONE;
 	}
 	
 	/**
-	 * Constructor
-	 * @param id The integer id for the Tile
-	 * @param name A human readable name describing the Tile
-	 * @param texPosition The Rectangle that this Tile's texture occupies in the tilesheet texture
+	 * Called when a neighboring Tile in the level is changed
+	 * @param level The Level where the Tile is being updated
+	 * @param self The location of the tile to be updated
+	 * @param src The location of the tile that caused the update
 	 */
-	public Tile(int id, String name, Rectangle texPosition) {
-		this(id, name, texPosition, TileProperties.NONE);
+	public void update(Level level, Location self, Location src) {
+		
 	}
 	
 	/**
@@ -55,9 +57,10 @@ public class Tile {
 	
 	/**
 	 * Getter for the texPosition field
+	 * @param data The data associated with the tile
 	 * @return
 	 */
-	public Rectangle getTexPosition() {
+	public Rectangle getTexPosition(int data) {
 		return this.texPosition;
 	}
 	
@@ -83,5 +86,13 @@ public class Tile {
 	 */
 	public boolean isLiquid() {
 		return (this.properties & TileProperties.LIQUID) == 1;
+	}
+	
+	/**
+	 * Determine whether the Tile has multiple orientations
+	 * @return true if the Tile has multiple orientations, false otherwise
+	 */
+	public boolean isMultidirectional() {
+		return (this.properties & TileProperties.MULTIDIRECTIONAL) == 1;
 	}
 }
