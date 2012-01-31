@@ -1,20 +1,28 @@
 package net.calzoneman.TileLand.player;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.UnicodeFont;
 
+import net.calzoneman.TileLand.TileLand;
+import net.calzoneman.TileLand.gfx.Renderable;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 import net.calzoneman.TileLand.tile.Tile;
 import net.calzoneman.TileLand.tile.TileTypes;
 
-public class Player {
+public class Player implements Renderable {
 	/** The name of the Player */
 	private String name;
 	/** The Texture of the player sprite */
 	private Texture sprite;
+	/** The font with which to render the player's nametag */
+	private UnicodeFont font;
 	/** The Level in which the Player currently exists */
 	private Level level;
 	/** The Player's position within the level */
@@ -84,10 +92,11 @@ public class Player {
 		this.currentBg = TileTypes.getDefaultBg();
 		this.currentFg = TileTypes.getFgTile("tree1");
 		this.editingFg = false;
-		this.keys = new boolean[Keyboard.getKeyCount()];
+		this.keys = new boolean[256]; // Keyboard.getKeyCount() seems to have issues...
 		this.mouse = new boolean[Mouse.getButtonCount()];
 		this.currentMoveKey = -1;
 		this.lastMoveTime = 0;
+		this.font = TileLand.getTextureManager().getDefaultFont();
 	}
 	
 	public void handleInput() {
@@ -281,4 +290,45 @@ public class Player {
 	public boolean isEditingFg() {
 		return this.editingFg;
 	}
+
+	@Override
+	public void render(int x, int y) {
+		// Draw the player sprite
+		glEnable(GL_BLEND);
+		sprite.bind();
+		glBegin(GL_QUADS);
+			glTexCoord2f(0, 0);
+			glVertex2f(x, y);
+			glTexCoord2f(1, 0);
+			glVertex2f(x+sprite.getTextureWidth(), y);
+			glTexCoord2f(1, 1);
+			glVertex2f(x+sprite.getTextureWidth(), y+sprite.getTextureHeight());
+			glTexCoord2f(0, 1);
+			glVertex2f(x, y+sprite.getTextureHeight());
+		glEnd();
+		glDisable(GL_BLEND);
+	}
+	
+	public void renderNameCentered() {
+		int w = font.getWidth(name);
+		int h = font.getHeight(name);
+		int x = Display.getWidth()/2  - w/2 + Level.TILESIZE/2;
+		int y = Display.getHeight()/2 - h - Level.TILESIZE;
+		Color.black.bind();
+		glBegin(GL_QUADS);
+			glVertex2f(x, y);
+			glVertex2f(x+w, y);
+			glVertex2f(x+w, y+h);
+			glVertex2f(x, y+h);
+		glEnd();
+		glEnable(GL_BLEND);
+		font.drawString(x, y, name);
+		glDisable(GL_BLEND);
+	}
+	
+	@Override
+	public void render(int x, int y, int data) {
+		render(x, y);
+	}
+
 }

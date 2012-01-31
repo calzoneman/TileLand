@@ -1,12 +1,10 @@
 package net.calzoneman.TileLand.gfx;
 
-import java.io.IOException;
-
+import net.calzoneman.TileLand.TileLand;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 import net.calzoneman.TileLand.player.Player;
 import net.calzoneman.TileLand.tile.Tile;
-import net.calzoneman.TileLand.tile.TileOrientation;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -14,15 +12,10 @@ import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.GL11.*;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.UnicodeFont;
-import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
-import org.newdawn.slick.util.ResourceLoader;
 
 public class Renderer {
-	/** The Texture to be used to render subimages */
-	private static Texture tileSheet;
 	/** The font to be used for text drawing */
 	private static UnicodeFont font;
 	/** FPS counter variables */
@@ -39,32 +32,6 @@ public class Renderer {
 	public static boolean init() {
 		if(!initGL(640, 480))
 			return false;
-		
-		try {
-			tileSheet = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("res/texture.png"));
-		}
-		catch(IOException ex) {
-			System.out.println("Error loading texture.png: ");
-			ex.printStackTrace();
-			return false;
-		}
-		catch(RuntimeException ex) {
-			System.out.println("Error loading texture.png: ");
-			ex.printStackTrace();
-			return false;
-		}
-		
-		try {
-			font = new UnicodeFont("res/pcpaint-fonts/PCPaintBoldSmall.ttf", 8, false, false);
-			font.addAsciiGlyphs();
-			font.getEffects().add(new ColorEffect()); // For some reason you have to add an effect...
-			font.loadGlyphs();
-		}
-		catch(Exception ex) {
-			System.out.println("Error loading font: ");
-			ex.printStackTrace();
-		}
-		
 		currentFrames = 0;
 		fps = 0;
 		lastFPSMeasureTime = System.nanoTime() - 1000000000;
@@ -94,7 +61,6 @@ public class Renderer {
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		// Enable Alpha
 		glEnable(GL_SRC_ALPHA);
-		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		// Setup the view
 		glViewport(0, 0, width, height);
@@ -111,6 +77,8 @@ public class Renderer {
 	 * @param ply The player object for which the game is being rendered
 	 */
 	public static void render(Player ply) {
+		if(font == null)
+			font = TileLand.getTextureManager().getDefaultFont();
 		if(System.nanoTime() >= lastFPSMeasureTime + 1000000000) {
 			fps = (int) currentFrames;
 			currentFrames = 0;
@@ -127,31 +95,29 @@ public class Renderer {
 			renderLevel(level, renderStart.x, renderStart.y, Display.getWidth() / Level.TILESIZE, Display.getHeight() / Level.TILESIZE, false);
 		}
 		// Render the player sprite
-		renderTexture(ply.getSprite(), (ply.getPosition().x - renderStart.x) * Level.TILESIZE, (ply.getPosition().y - renderStart.y) * Level.TILESIZE);
+		ply.render((ply.getPosition().x - renderStart.x) * Level.TILESIZE, (ply.getPosition().y - renderStart.y) * Level.TILESIZE);
+		//renderTexture(ply.getSprite(), (ply.getPosition().x - renderStart.x) * Level.TILESIZE, (ply.getPosition().y - renderStart.y) * Level.TILESIZE);
 		// Render the foreground
 		if(level != null) {
 			renderLevel(level, renderStart.x, renderStart.y, Display.getWidth() / Level.TILESIZE, Display.getHeight() / Level.TILESIZE, true);
 		}
 		// Render the mouse hover
-		Rectangle current = null;
+		Tile current = null;
 		Color col = transparent_green;
 		int tx = Mouse.getX() / Level.TILESIZE + renderStart.x;
 		int ty = (Display.getHeight() - Mouse.getY()) / Level.TILESIZE + renderStart.y;
 		if((tx == ply.getPosition().x && ty == ply.getPosition().y && ply.isEditingFg()) || tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight())
 			col = transparent_red;
-		current = ply.getCurrentTile().getTexPosition(TileOrientation.NONE);
+		current = ply.getCurrentTile();
 		col.bind();
 		renderMouse(current);
 		
-		// Render the player's name
-		int sx = Display.getWidth()/2-font.getWidth(ply.getName())/2+Level.TILESIZE/2;
-		int sy = Display.getHeight()/2-Level.TILESIZE;
-		// Background
-		Color.black.bind();
-		renderRectangle(new Rectangle(sx, sy, font.getWidth(ply.getName()), font.getHeight(ply.getName())), true);
-		font.drawString(sx, sy, ply.getName(), Color.white);
+		// Render the player's nametag
+		ply.renderNameCentered();
 		// Render FPS
+		glEnable(GL_BLEND);
 		font.drawString(0, 0, "FPS: " + fps);
+		glDisable(GL_BLEND);
 		currentFrames++;
 	}
 	
@@ -169,13 +135,22 @@ public class Renderer {
 			for(int j = offY; j < offY + maxHeight; j++) {
 				if(foreground) {
 					Tile fg = lvl.getFg(i, j);
-					if(fg != null && fg.getId() != -1)
-						renderTextureSubrectangle(tileSheet, fg.getTexPosition(TileOrientation.NONE), (i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
+					if(fg != null && fg.getId() != -1) {
+						if(fg.hasData())
+							fg.render((i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE, lvl.getFgData(i,  j));
+						else
+							fg.render((i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
+					}
 				}
 				else {
 					Tile bg = lvl.getBg(i, j);
-					if(bg != null)
-						renderTextureSubrectangle(tileSheet, bg.getTexPosition(lvl.getBgData(i, j)), (i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
+					if(bg != null) {
+						if(bg.hasData()) {
+							bg.render((i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE, lvl.getBgData(i,  j));
+						}
+						else
+							bg.render((i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
+					}
 				}
 				
 			}
@@ -185,7 +160,7 @@ public class Renderer {
 	/**
 	 * Renders the mouse hover
 	 */
-	public static void renderMouse(Rectangle currentTile) {
+	public static void renderMouse(Tile currentTile) {
 		if(currentTile == null)
 			return;
 		int mx = Mouse.getX();
@@ -193,7 +168,7 @@ public class Renderer {
 		int tx = mx / Level.TILESIZE;
 		int ty = (Display.getHeight() - my) / Level.TILESIZE;
 		// Draw overlay
-		renderTextureSubrectangle(tileSheet, currentTile, tx * Level.TILESIZE, ty * Level.TILESIZE);
+		currentTile.render(tx * Level.TILESIZE, ty * Level.TILESIZE);
 		// Draw border
 		Color.black.bind();
 		renderRectangle(new Rectangle(tx * Level.TILESIZE, ty * Level.TILESIZE, Level.TILESIZE, Level.TILESIZE), false);
@@ -204,6 +179,7 @@ public class Renderer {
 	 * @param x The x-coordinate at which to render the texture
 	 * @param y The y-coordinate at which to render the texture
 	 */
+	@Deprecated
 	public static void renderTexture(Texture tex, int x, int y) {
 		tex.bind();
 		glBegin(GL_QUADS);
@@ -225,6 +201,7 @@ public class Renderer {
 	 * @param x The x coordinate at which to draw the rectangle
 	 * @param y The y coordinate at which to draw the rectangle
 	 */
+	@Deprecated
 	public static void renderTextureSubrectangle(Texture tex, Rectangle rect, int x, int y) {
 		int texWidth = tex.getTextureWidth();
 		int texHeight = tex.getTextureHeight();
@@ -251,7 +228,6 @@ public class Renderer {
 	 * @param filled Whether the rectangle is filled or solid
 	 */
 	public static void renderRectangle(Rectangle rect, boolean filled) {
-		glDisable(GL_BLEND);
 		if(filled)
 			glBegin(GL_QUADS);
 		else
@@ -261,6 +237,5 @@ public class Renderer {
 		glVertex2f(rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight());
 		glVertex2f(rect.getX(), rect.getY() + rect.getHeight());
 		glEnd();
-		glEnable(GL_BLEND);
 	}
 }

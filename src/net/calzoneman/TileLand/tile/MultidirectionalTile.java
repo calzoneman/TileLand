@@ -1,20 +1,23 @@
 package net.calzoneman.TileLand.tile;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import java.util.HashMap;
 
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.opengl.Texture;
 
 public class MultidirectionalTile extends Tile {
 	protected HashMap<Integer, Rectangle> orientationTextures;
 	protected boolean foreground;
 
-	public MultidirectionalTile(int id, String name, Rectangle texPosition, boolean foreground) {
-		super(id, name, texPosition);
+	public MultidirectionalTile(int id, String name, Texture tex, Rectangle texPosition, boolean foreground) {
+		super(id, name, tex, texPosition);
 		this.foreground = foreground;
-		this.properties = TileProperties.MULTIDIRECTIONAL;
+		this.properties = TileProperties.MULTIDIRECTIONAL | TileProperties.HASDATA;
 		this.orientationTextures = new HashMap<Integer, Rectangle>();
 		loadOrientations(texPosition);
 		this.texPosition = orientationTextures.get(TileOrientation.CENTER);
@@ -232,10 +235,38 @@ public class MultidirectionalTile extends Tile {
 		level.setFgData(self.x, self.y, newOrientation);
 	}
 	
-	@Override
 	public Rectangle getTexPosition(int orientation) {
 		if(orientationTextures.containsKey(orientation))
 			return orientationTextures.get(orientation);
 		return texPosition;
+	}
+	
+	@Override
+	public void render(int x, int y) {
+		render(x, y, 0);
+	}
+	
+	@Override
+	public void render(int x, int y, int data) {
+		Rectangle rect = getTexPosition(data);
+		int texWidth = tex.getTextureWidth();
+		int texHeight = tex.getTextureHeight();
+		float rectX = rect.getX();
+		float rectY = rect.getY();
+		float rectWidth = rect.getWidth();
+		float rectHeight = rect.getHeight();
+		glEnable(GL_BLEND);
+		tex.bind();
+		glBegin(GL_QUADS);
+			glTexCoord2f(rectX / texWidth, rectY / texHeight);
+			glVertex2f(x, y);
+			glTexCoord2f((rectX + rectWidth) / texWidth, rectY / texHeight);
+			glVertex2f(x + rectWidth, y);
+			glTexCoord2f((rectX + rectWidth) / texWidth, (rectY + rectHeight) / texHeight);
+			glVertex2f(x + rectWidth, y + rectHeight);
+			glTexCoord2f(rectX / texWidth, (rectY + rectHeight) / texHeight);
+			glVertex2f(x, y + rectHeight);
+		glEnd();
+		glDisable(GL_BLEND);
 	}
 }

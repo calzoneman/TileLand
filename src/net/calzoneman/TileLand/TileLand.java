@@ -8,12 +8,10 @@ import net.calzoneman.TileLand.tile.TileTypes;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
-import org.newdawn.slick.util.ResourceLoader;
 
 public class TileLand {
+	static TextureManager tm;
 	public static void main(String[] args) {
-		TileTypes.init();
 		StartupGUI s = new StartupGUI();
 		while(!s.ready){
 			try {
@@ -22,17 +20,13 @@ public class TileLand {
 			catch(Exception ex) {
 				
 			}
-		}
+		}	
 		if(!Renderer.init())
 			return;
+		tm = new TextureManager();
+		TileTypes.init();
 		// Load the player sprite
-		Texture plyTexture = null;
-		try {
-			plyTexture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("res/player.png"));
-		}
-		catch(Exception ex) {
-			System.out.println("Error: Player texture could not be loaded");
-		}
+		Texture plyTexture = tm.getTexture("player.png");
 		Level level;
 		if(s.makeNewLevel) level = new Level(s.newMapSize.width, s.newMapSize.height, s.selectedMapName);
 		else level = new Level(s.selectedMapName);
@@ -52,5 +46,9 @@ public class TileLand {
 				System.exit(0);
 			}
 		}
+	}
+	
+	public static TextureManager getTextureManager() {
+		return tm;
 	}
 }

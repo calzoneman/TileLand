@@ -1,16 +1,22 @@
 package net.calzoneman.TileLand.tile;
 
+import static org.lwjgl.opengl.GL11.*;
+import net.calzoneman.TileLand.gfx.Renderable;
+import net.calzoneman.TileLand.inventory.Holdable;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.opengl.Texture;
 
 
-public class Tile {
+public class Tile implements Renderable, Holdable {
 	/** The id of the tiletype.  In saves this is a short, but making it int here will save loads of unnecessary casting */
 	private int id;
 	/** A human readable string identifying the Tile */
 	private String name;
+	/** The tilesheet texture to be used */
+	protected Texture tex;
 	/** The rectangle of the tilesheet this Tile will render */
 	protected Rectangle texPosition;
 	/** A flags variable comprised of the properties of this Tile */
@@ -22,9 +28,10 @@ public class Tile {
 	 * @param name A human readable name describing the Tile
 	 * @param texPosition The Rectangle that this Tile's texture occupies in the tilesheet texture
 	 */
-	public Tile(int id, String name, Rectangle texPosition) {
+	public Tile(int id, String name, Texture tex, Rectangle texPosition) {
 		this.id = id;
 		this.name = name;
+		this.tex = tex;
 		this.texPosition = texPosition;
 		this.properties = TileProperties.NONE;
 	}
@@ -35,6 +42,7 @@ public class Tile {
 	 * @param self The location of the tile to be updated
 	 * @param src The location of the tile that caused the update
 	 */
+	@Deprecated
 	public void update(Level level, Location self, Location src) {
 		
 	}
@@ -60,6 +68,7 @@ public class Tile {
 	 * @param data The data associated with the tile
 	 * @return
 	 */
+	@Deprecated
 	public Rectangle getTexPosition(int data) {
 		return this.texPosition;
 	}
@@ -77,7 +86,7 @@ public class Tile {
 	 * @return true if the Tile is solid, false otherwise
 	 */
 	public boolean isSolid() {
-		return (this.properties & TileProperties.SOLID) == 1;
+		return (this.properties & TileProperties.SOLID) >= 1;
 	}
 	
 	/**
@@ -85,7 +94,7 @@ public class Tile {
 	 * @return true if the Tile is liquid, false otherwise
 	 */
 	public boolean isLiquid() {
-		return (this.properties & TileProperties.LIQUID) == 1;
+		return (this.properties & TileProperties.LIQUID) >= 1;
 	}
 	
 	/**
@@ -93,6 +102,54 @@ public class Tile {
 	 * @return true if the Tile has multiple orientations, false otherwise
 	 */
 	public boolean isMultidirectional() {
-		return (this.properties & TileProperties.MULTIDIRECTIONAL) == 1;
+		return (this.properties & TileProperties.MULTIDIRECTIONAL) >= 1;
+	}
+	
+	public boolean hasData() {
+		return (this.properties & TileProperties.HASDATA) >= 1;
+	}
+
+	@Override
+	public void leftClick(Level lvl, int x, int y, boolean fgLayer) {
+		if(fgLayer)
+			lvl.setFg(x, y, this);
+		else
+			lvl.setBg(x, y, this);
+	}
+
+	@Override
+	public void rightClick(Level lvl, int x, int y, boolean fgLayer) {
+		if(fgLayer)
+			lvl.setFg(x, y, TileTypes.getDefaultFg());
+		else
+			lvl.setBg(x, y, TileTypes.getDefaultBg());
+	}
+
+	@Override
+	public void render(int x, int y) {
+		int texWidth = tex.getTextureWidth();
+		int texHeight = tex.getTextureHeight();
+		float rectX = texPosition.getX();
+		float rectY = texPosition.getY();
+		float rectWidth = texPosition.getWidth();
+		float rectHeight = texPosition.getHeight();
+		tex.bind();
+		glEnable(GL_BLEND);
+		glBegin(GL_QUADS);
+			glTexCoord2f(rectX / texWidth, rectY / texHeight);
+			glVertex2f(x, y);
+			glTexCoord2f((rectX + rectWidth) / texWidth, rectY / texHeight);
+			glVertex2f(x + rectWidth, y);
+			glTexCoord2f((rectX + rectWidth) / texWidth, (rectY + rectHeight) / texHeight);
+			glVertex2f(x + rectWidth, y + rectHeight);
+			glTexCoord2f(rectX / texWidth, (rectY + rectHeight) / texHeight);
+			glVertex2f(x, y + rectHeight);
+		glEnd();
+		glDisable(GL_BLEND);
+	}
+
+	@Override
+	public void render(int x, int y, int data) {
+		render(x, y);		
 	}
 }

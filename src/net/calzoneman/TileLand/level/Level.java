@@ -352,6 +352,9 @@ public class Level {
 		this.bgTiles = new short[width * height];
 		this.fgTiles = new short[width * height];
 		
+		this.bgData = new byte[width * height];
+		this.fgData = new byte[width * height];
+		
 		for(int i = 0; i < width; i++) {
 			for(int j = 0; j < height; j++) {
 				int grass = rand.nextInt(100);

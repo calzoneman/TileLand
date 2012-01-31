@@ -3,7 +3,9 @@ package net.calzoneman.TileLand.tile;
 import java.util.HashMap;
 
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.opengl.Texture;
 
+import net.calzoneman.TileLand.TileLand;
 import net.calzoneman.TileLand.player.Player;
 
 public class TileTypes {
@@ -16,7 +18,7 @@ public class TileTypes {
 	/** A Dictionary of Foreground Tile IDs keyed by name */
 	private static HashMap<String, Integer> fgTileNames;
 	
-	public static void init() {
+	public static void init() {		
 		// Initialize Tile type Dictionaries
 		bgTileTypes = new HashMap<Integer, Tile>();
 		fgTileTypes = new HashMap<Integer, Tile>();
@@ -25,25 +27,27 @@ public class TileTypes {
 		fgTileNames = new HashMap<String, Integer>();
 		bgTileNames = new HashMap<String, Integer>();
 		
-		// Initialize Tile types
-		addBgTile(new SolidTile(-1, "null", new Rectangle(0, 0, 32, 32)));
-		addBgTile(new Tile(0, "grass1", new Rectangle(160, 192, 32, 32)));
-		addBgTile(new Tile(1, "grass2", new Rectangle(192, 192, 32,32)));
-		addBgTile(new Tile(2, "grass3", new Rectangle(224, 192, 32, 32)));
-		addBgTile(new MultidirectionalTile(3, "lake", new Rectangle(160, 288, 96, 96), false));
-		addBgTile(new MultidirectionalTile(4, "sand", new Rectangle(320, 288, 96, 96), false));
-		addBgTile(new MultidirectionalTile(5, "cobbleroad", new Rectangle(0, 192, 96, 96), false));
-		addBgTile(new MultidirectionalTile(6, "snow", new Rectangle(0, 384, 96, 96), false));
-		addBgTile(new MultidirectionalTile(7, "frozenlake", new Rectangle(0, 288, 96, 96), false));
-		addBgTile(new MultidirectionalTile(8, "dirt", new Rectangle(352, 0, 96, 96), false));
+		Texture tex = TileLand.getTextureManager().getTexture("tiles.png");
 		
-		addFgTile(new Tile(-1, "air", new Rectangle(128, 448, 32, 32)));
-		addFgTile(new SolidTile(0, "tree1", new Rectangle(32, 128, 32, 32)));
-		addFgTile(new SolidTile(1, "tree2", new Rectangle(64, 128, 32, 32)));
-		addFgTile(new SolidTile(2, "bush1", new Rectangle(96, 128, 32, 32)));
-		addFgTile(new SolidTile(3, "sign1", new Rectangle(128, 128, 32, 32)));
-		addFgTile(new SolidTile(4, "sign2", new Rectangle(160, 128, 32, 32)));
-		addFgTile(new SolidTile(5, "sign3", new Rectangle(192, 128, 32, 32)));
+		// Initialize Tile types
+		addBgTile(new SolidTile(-1, "null", tex, new Rectangle(0, 0, 32, 32)));
+		addBgTile(new Tile(0, "grass1", tex, new Rectangle(160, 192, 32, 32)));
+		addBgTile(new Tile(1, "grass2", tex, new Rectangle(192, 192, 32,32)));
+		addBgTile(new Tile(2, "grass3", tex, new Rectangle(224, 192, 32, 32)));
+		addBgTile(new MultidirectionalTile(3, "lake", tex, new Rectangle(160, 288, 96, 96), false));
+		addBgTile(new MultidirectionalTile(4, "sand", tex, new Rectangle(320, 288, 96, 96), false));
+		addBgTile(new MultidirectionalTile(5, "cobbleroad", tex, new Rectangle(0, 192, 96, 96), false));
+		addBgTile(new MultidirectionalTile(6, "snow", tex, new Rectangle(0, 384, 96, 96), false));
+		addBgTile(new MultidirectionalTile(7, "frozenlake", tex, new Rectangle(0, 288, 96, 96), false));
+		addBgTile(new MultidirectionalTile(8, "dirt", tex, new Rectangle(352, 0, 96, 96), false));
+		
+		addFgTile(new Tile(-1, "air", tex, new Rectangle(128, 448, 32, 32)));
+		addFgTile(new SolidTile(0, "tree1", tex, new Rectangle(32, 128, 32, 32)));
+		addFgTile(new SolidTile(1, "tree2", tex, new Rectangle(64, 128, 32, 32)));
+		addFgTile(new SolidTile(2, "bush1", tex, new Rectangle(96, 128, 32, 32)));
+		addFgTile(new SolidTile(3, "sign1", tex, new Rectangle(128, 128, 32, 32)));
+		addFgTile(new SolidTile(4, "sign2", tex, new Rectangle(160, 128, 32, 32)));
+		addFgTile(new SolidTile(5, "sign3", tex, new Rectangle(192, 128, 32, 32)));
 	}
 	
 	/**

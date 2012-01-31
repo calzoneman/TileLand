@@ -1,12 +1,12 @@
 package net.calzoneman.TileLand.tile;
 
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.opengl.Texture;
 
 public class SolidTile extends Tile {
 
-	public SolidTile(int id, String name, Rectangle texPosition) {
-		super(id, name, texPosition);
+	public SolidTile(int id, String name, Texture tex, Rectangle texPosition) {
+		super(id, name, tex, texPosition);
 		this.properties = TileProperties.SOLID;
 	}
-
 }
