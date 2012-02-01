@@ -7,6 +7,7 @@ import net.calzoneman.TileLand.tile.TileTypes;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 
 public class TileLand {
@@ -32,6 +33,19 @@ public class TileLand {
 		else level = new Level(s.selectedMapName);
 		Player ply = new Player(plyTexture, level, s.playerName);
 		s.dispose();
+		
+		if(!ply.getLevel().initialized) {
+			while(true) {
+				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+				tm.getDefaultFont().drawString(0, 0, "Uh Oh!  The level is broken!", Color.red);
+				tm.getDefaultFont().drawString(0, 10, "Make sure it's not an outdated file!", Color.red);
+				Display.update();
+				if(Display.isCloseRequested()) {
+					Display.destroy();
+					System.exit(0);
+				}
+			}
+		}
 		
 		while(true) {
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);

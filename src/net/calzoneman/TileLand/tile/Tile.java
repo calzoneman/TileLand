@@ -3,6 +3,7 @@ package net.calzoneman.TileLand.tile;
 import static org.lwjgl.opengl.GL11.*;
 import net.calzoneman.TileLand.gfx.Renderable;
 import net.calzoneman.TileLand.inventory.Holdable;
+import net.calzoneman.TileLand.level.Layer;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 
@@ -36,16 +37,7 @@ public class Tile implements Renderable, Holdable {
 		this.properties = TileProperties.NONE;
 	}
 	
-	/**
-	 * Called when a neighboring Tile in the level is changed
-	 * @param level The Level where the Tile is being updated
-	 * @param self The location of the tile to be updated
-	 * @param src The location of the tile that caused the update
-	 */
-	@Deprecated
-	public void update(Level level, Location self, Location src) {
-		
-	}
+	public void updateData(Layer level, Location self) { }
 	
 	/**
 	 * Getter for the id field
@@ -61,16 +53,6 @@ public class Tile implements Renderable, Holdable {
 	 */
 	public String getName() {
 		return this.name;
-	}
-	
-	/**
-	 * Getter for the texPosition field
-	 * @param data The data associated with the tile
-	 * @return
-	 */
-	@Deprecated
-	public Rectangle getTexPosition(int data) {
-		return this.texPosition;
 	}
 	
 	/**
@@ -127,6 +109,8 @@ public class Tile implements Renderable, Holdable {
 
 	@Override
 	public void render(int x, int y) {
+		if(tex == null || texPosition == null)
+			return;
 		int texWidth = tex.getTextureWidth();
 		int texHeight = tex.getTextureHeight();
 		float rectX = texPosition.getX();

@@ -9,7 +9,6 @@ import java.nio.ShortBuffer;
 import java.util.Random;
 
 import net.calzoneman.TileLand.tile.Tile;
-import net.calzoneman.TileLand.tile.TileTypes;
 
 public class Level {
 	/** The size, in bytes, of the level header */
@@ -17,7 +16,7 @@ public class Level {
 	/** The magic number for the level header */
 	public static final int SAVE_MAGIC = 0x54494c45; // "TILE" in ASCII hex
 	/** The file format version */
-	public static final byte SAVE_VERSION = 0x02;
+	public static final byte SAVE_VERSION = 0x03;
 	/** Constant for the dimension of a Tile texture */
 	public static final int TILESIZE = 32;
 	/** Randomizer for Level generation */
@@ -28,16 +27,14 @@ public class Level {
 	private int height = 0;
 	/** The spawnpoint of the Level */
 	private Location spawnpoint = new Location(0, 0);
-	/** An array of ids for the background layer of the Level */
-	private short[] bgTiles;
-	/** An array of data bytes for the background layer of the level */
-	private byte[] bgData;
-	/** An array of ids for the foreground layer of the Level */
-	private short[] fgTiles;
-	/** An array of data bytes for the background layer of the level */
-	private byte[] fgData;
+	/** Background layer */
+	private BackgroundLayer backgroundLayer;
+	/** Foreground layer */
+	private ForegroundLayer foregroundLayer;
 	/** The name of the Level */
 	public String name = "save";
+	/** Whether or not the Level is initialized */
+	public boolean initialized = false;
 	
 	/**
 	 * Constructor - Generates a new Level with the specified width and height
@@ -48,7 +45,9 @@ public class Level {
 		this.rand = new Random();
 		this.width = width;
 		this.height = height;
-		this.generate(width, height);
+		this.backgroundLayer = new BackgroundLayer(width, height, rand);
+		this.foregroundLayer = new ForegroundLayer(width, height, rand);
+		this.initialized = true;
 	}
 	
 	/**
@@ -86,13 +85,17 @@ public class Level {
 			buf.putInt(height);
 			buf.putInt(spawnpoint.x);
 			buf.putInt(spawnpoint.y);
+			short[] bgTiles = backgroundLayer.getTileArray();
 			for(int i = 0; i < width * height; i++) {
 				buf.putShort(bgTiles[i]);
 			}
+			short[] fgTiles = foregroundLayer.getTileArray();
 			for(int i = 0; i < width * height; i++) {
 				buf.putShort(fgTiles[i]);
 			}
+			byte[] bgData = backgroundLayer.getDataArray();
 			buf.put(bgData);
+			byte[] fgData = backgroundLayer.getDataArray();
 			buf.put(fgData);
 			fos.write(buf.array());
 			fos.close();
@@ -109,11 +112,11 @@ public class Level {
 	 * Loads a Level from disk and assigns appropriate fields
 	 * @param filename The filename to load from, relative to saves/
 	 */
-	public void load(String filename) {
+	public boolean load(String filename) {
 		File savefile = new File("saves/" + filename);
 		if(!savefile.exists()) {
 			System.out.println("Savefile doesn't exist!");
-			return;
+			return false;
 		}
 		try {
 			FileInputStream fis = new FileInputStream(savefile);
@@ -122,11 +125,11 @@ public class Level {
 			hdrbuf.rewind();
 			if(hdrbuf.getInt() != SAVE_MAGIC) {
 				System.out.println("Wrong magic number in level!");
-				return;
+				return false;
 			}
-			if(hdrbuf.get() > SAVE_VERSION) {
+			if(hdrbuf.get() != SAVE_VERSION) {
 				System.out.println("Wrong save format version");
-				return;
+				return false;
 			}
 			this.width = hdrbuf.getInt();
 			this.height = hdrbuf.getInt();
@@ -137,23 +140,29 @@ public class Level {
 			databuf.rewind();
 			
 			ShortBuffer mapBuf = databuf.asShortBuffer();
-			bgTiles = new short[width * height];
-			fgTiles = new short[width * height];
+			short[] bgTiles = new short[width * height];
+			short[] fgTiles = new short[width * height];
 			mapBuf.get(bgTiles);
 			mapBuf.get(fgTiles);
 			databuf.position(mapBuf.position() * 2);
-			bgData = new byte[width * height];
-			fgData = new byte[width * height];
+			byte[] bgData = new byte[width * height];
+			byte[] fgData = new byte[width * height];
 			databuf.get(bgData);
 			databuf.get(fgData);
+			this.backgroundLayer = new BackgroundLayer(width, height, bgTiles, bgData);
+			this.foregroundLayer = new ForegroundLayer(width, height, fgTiles, fgData);
 			this.name = filename.substring(0, filename.indexOf(".tl"));
 		}
 		catch(IOException ex) {
 			System.out.println("Unable to load level!");
+			return false;
 		}
 		catch(Exception ex) {
 			System.out.println("Unable to load level!");
+			return false;
 		}
+		initialized = true;
+		return true;
 	}
 	
 	// Tile getters/setters
@@ -166,12 +175,7 @@ public class Level {
 	 * @return The ID of the background Tile at (x, y), or -1 if the location is invalid
 	 */
 	public short getBgId(int x, int y) {
-		if(x < 0 || x >= width || y < 0 || y >= height) {
-			return -1;
-		}
-		else {
-			return bgTiles[y * width + x];
-		}
+		return (short) backgroundLayer.getId(x, y);
 	}
 	
 	/**
@@ -181,7 +185,7 @@ public class Level {
 	 * @return The background Tile at (x, y), or null if the location is invalid
 	 */
 	public Tile getBg(int x, int y) {
-		return TileTypes.getBgTile(getBgId(x, y));
+		return backgroundLayer.getTile(x, y);
 	}
 	
 	/**
@@ -192,12 +196,8 @@ public class Level {
 	 * @return true if the setting was successful, false otherwise
 	 */
 	public boolean setBgId(int x, int y, int id) {
-		if(x < 0 || x >= width || y < 0 || y >= height) {
-			return false;
-		}
-		bgTiles[y * width + x] = (short)id;
-		setBgData(x, y, 0);
-		updateBg(new Location(x, y));
+		if(backgroundLayer.setId(x, y, id))
+			updateBgData(new Location(x, y));
 		return true;
 	}
 	
@@ -211,7 +211,11 @@ public class Level {
 	public boolean setBg(int x, int y, Tile t) {
 		if(t == null)
 			return false;
-		return setBgId(x, y, t.getId());
+		if(backgroundLayer.setTile(x, y, t)) {
+			updateBgData(new Location(x, y));
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -221,9 +225,7 @@ public class Level {
 	 * @return The data field associated with the point x, y
 	 */
 	public int getBgData(int x, int y) {
-		if(x < 0 || x >= width || y < 0 || y >= height) 
-			return -1;
-		return bgData[y * width + x];
+		return backgroundLayer.getData(x, y);
 	}
 	
 	/**
@@ -234,25 +236,25 @@ public class Level {
 	 * @return True if successful, false if not
 	 */
 	public boolean setBgData(int x, int y, int data) {
-		if(x < 0 || x >= width || y < 0 || y >= height) {
-			return false;
-		}
-		bgData[y * width + x] = (byte)data;
-		return true;
+		return backgroundLayer.setData(x, y, data);
 	}
 	
 	/**
-	 * Updates neighbors on the background layer
+	 * Updates data on the background layer
 	 * @param src The Location to update
 	 */
-	public void updateBg(Location src) {
-		getBg(src.x, src.y).update(this, src, src);
-		getBg(src.x + 1, src.y).update(this, new Location(src.x + 1, src.y), src);
-		getBg(src.x - 1, src.y).update(this, new Location(src.x - 1, src.y), src);
-		getBg(src.x, src.y + 1).update(this, new Location(src.x, src.y + 1), src);
-		getBg(src.x, src.y - 1).update(this, new Location(src.x, src.y - 1), src);
+	public void updateBgData(Location src) {
+		getBg(src.x, src.y).updateData(backgroundLayer, src);
+		if(src.x + 1 < width)
+			getBg(src.x + 1, src.y).updateData(backgroundLayer, new Location(src.x + 1, src.y));
+		if(src.x - 1 >= 0)
+			getBg(src.x - 1, src.y).updateData(backgroundLayer, new Location(src.x - 1, src.y));
+		if(src.y + 1 < height)
+			getBg(src.x, src.y + 1).updateData(backgroundLayer, new Location(src.x, src.y + 1));
+		if(src.y - 1 >= 0)
+			getBg(src.x, src.y - 1).updateData(backgroundLayer, new Location(src.x, src.y - 1));
 	}
-	// Foreground
+
 	/**
 	 * Get the ID of the foreground tile at (x, y)
 	 * @param x The x coordinate of the Tile
@@ -260,12 +262,7 @@ public class Level {
 	 * @return The ID of the foreground Tile at (x, y), or -1 if the location is invalid
 	 */
 	public short getFgId(int x, int y) {
-		if(x < 0 || x >= width || y < 0 || y >= height) {
-			return -1;
-		}
-		else {
-			return fgTiles[y * width + x];
-		}
+		return (short) foregroundLayer.getId(x, y);
 	}
 	
 	/**
@@ -275,7 +272,7 @@ public class Level {
 	 * @return The foreground Tile at (x, y), or null if the location is invalid
 	 */
 	public Tile getFg(int x, int y) {
-		return TileTypes.getFgTile(getFgId(x, y));
+		return foregroundLayer.getTile(x, y);
 	}
 	
 	/**
@@ -286,12 +283,8 @@ public class Level {
 	 * @return true if the setting was successful, false otherwise
 	 */
 	public boolean setFgId(int x, int y, int id) {
-		if(x < 0 || x >= width || y < 0 || y >= height) {
-			return false;
-		}
-		fgTiles[y * width + x] = (short)id;
-		setFgData(x, y, 0);
-		updateFg(new Location(x, y));
+		if(foregroundLayer.setId(x, y, id))
+			updateFgData(new Location(x, y));
 		return true;
 	}
 	
@@ -305,7 +298,11 @@ public class Level {
 	public boolean setFg(int x, int y, Tile t) {
 		if(t == null)
 			return false;
-		return setFgId(x, y, t.getId());
+		if(foregroundLayer.setTile(x, y, t)) {
+			updateFgData(new Location(x, y));
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -315,9 +312,7 @@ public class Level {
 	 * @return The data field associated with the point x, y
 	 */
 	public int getFgData(int x, int y) {
-		if(x < 0 || x >= width || y < 0 || y >= height) 
-			return -1;
-		return fgData[y * width + x];
+		return foregroundLayer.getData(x, y);
 	}
 	
 	/**
@@ -328,70 +323,23 @@ public class Level {
 	 * @return True if successful, false if not
 	 */
 	public boolean setFgData(int x, int y, int data) {
-		if(x < 0 || x >= width || y < 0 || y >= height) {
-			return false;
-		}
-		fgData[y * width + x] = (byte)data;
-		return true;
+		return foregroundLayer.setData(x, y, data);
 	}
 	
 	/**
 	 * Updates neighbors on the foreground layer
 	 * @param src The Location to update
 	 */
-	public void updateFg(Location src) {
-		getFg(src.x, src.y).update(this, src, src);
-		getFg(src.x + 1, src.y).update(this, new Location(src.x + 1, src.y), src);
-		getFg(src.x - 1, src.y).update(this, new Location(src.x - 1, src.y), src);
-		getFg(src.x, src.y + 1).update(this, new Location(src.x, src.y + 1), src);
-		getFg(src.x, src.y - 1).update(this, new Location(src.x, src.y - 1), src);
-	}
-	
-	// Generation
-	public void generate(int width, int height) {
-		this.bgTiles = new short[width * height];
-		this.fgTiles = new short[width * height];
-		
-		this.bgData = new byte[width * height];
-		this.fgData = new byte[width * height];
-		
-		for(int i = 0; i < width; i++) {
-			for(int j = 0; j < height; j++) {
-				int grass = rand.nextInt(100);
-				if(grass <  5) {
-					bgTiles[j * width + i] = (short)TileTypes.getBgTile("grass2").getId();
-				}
-				else if(grass < 10) {
-					bgTiles[j * width + i] = (short)TileTypes.getBgTile("grass3").getId();;
-				}
-				else {
-					bgTiles[j * width + i] = (short)TileTypes.getBgTile("grass1").getId();;
-				}
-			}
-		}
-		
-		for(int i = 0; i < width; i++) {
-			for(int j = 0; j < height; j++) {
-				double fgstuff = rand.nextDouble();
-				if(fgstuff < 0.05) {
-					fgTiles[j * width + i] = (short)TileTypes.getFgTile("tree1").getId();
-				}
-				else if(fgstuff < 0.07) {
-					fgTiles[j * width + i] = (short)TileTypes.getFgTile("tree2").getId();
-				}
-				else if(fgstuff < 0.09) {
-					fgTiles[j *  width + i] = (short)TileTypes.getFgTile("bush1").getId();
-				}
-				else {
-					fgTiles[j * width + i] = (short)TileTypes.getFgTile("air").getId();
-				}
-			}
-		}
-		
-		this.spawnpoint = new Location(rand.nextInt(width), rand.nextInt(height));
-		while(getFgId(spawnpoint.x, spawnpoint.y) != -1) {
-			this.spawnpoint = new Location(rand.nextInt(width), rand.nextInt(height));
-		}
+	public void updateFgData(Location src) {
+		getFg(src.x, src.y).updateData(foregroundLayer, src);
+		if(src.x + 1 < width)
+			getFg(src.x + 1, src.y).updateData(foregroundLayer, new Location(src.x + 1, src.y));
+		if(src.x - 1 >= 0)
+			getFg(src.x - 1, src.y).updateData(foregroundLayer, new Location(src.x - 1, src.y));
+		if(src.y + 1 < height)
+			getFg(src.x, src.y + 1).updateData(foregroundLayer, new Location(src.x, src.y + 1));
+		if(src.y - 1 >= 0)
+			getFg(src.x, src.y - 1).updateData(foregroundLayer, new Location(src.x, src.y - 1));
 	}
 	
 	public int getWidth() {
