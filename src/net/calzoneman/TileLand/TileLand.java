@@ -11,7 +11,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 
 public class TileLand {
-	public static final String version = "0.15a";
+	public static final String version = "0.16a";
 	static TextureManager tm;
 	public static void main(String[] args) {
 		StartupGUI s = new StartupGUI();

@@ -46,7 +46,7 @@ public class Renderer {
 	private static boolean initGL(int width, int height) {
 		try {
 			Display.setDisplayMode(new DisplayMode(width, height));
-			Display.setTitle("TileLand - LWJGL Edition");
+			Display.setTitle("TileLand " + TileLand.version);
 			Display.create();
 			Display.setVSyncEnabled(true);
 		}

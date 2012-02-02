@@ -10,6 +10,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.UnicodeFont;
 
 import net.calzoneman.TileLand.TileLand;
+import net.calzoneman.TileLand.gfx.PlayerSprite;
 import net.calzoneman.TileLand.gfx.Renderable;
 import net.calzoneman.TileLand.inventory.Holdable;
 import net.calzoneman.TileLand.inventory.Inventory;
@@ -21,8 +22,8 @@ import net.calzoneman.TileLand.tile.TileTypes;
 public class Player implements Renderable {
 	/** The name of the Player */
 	private String name;
-	/** The Texture of the player sprite */
-	private Texture sprite;
+	/** The player sprite */
+	private PlayerSprite sprite;
 	/** The font with which to render the player's nametag */
 	private UnicodeFont font;
 	/** The Level in which the Player currently exists */
@@ -41,6 +42,8 @@ public class Player implements Renderable {
 	private boolean[] mouse;
 	/** The keycode of the current movement key being pressed, or -1 if none are pressed */
 	private int currentMoveKey;
+	/** The current direction the player is facing */
+	private int facing = PlayerSprite.FACING_DOWN;
 	/** The time, in milliseconds, since the last movement */
 	private long lastMoveTime;
 	private Inventory inventory;
@@ -203,58 +206,77 @@ public class Player implements Renderable {
 	}
 	
 	private void move() {
+		String move = "";
 		switch(currentMoveKey) {
-		case Keyboard.KEY_W:
-			if(position.y-1 < 0)
+			case Keyboard.KEY_W:
+				if(position.y-1 < 0)
+					break;
+				Tile up = level.getFg(position.x, position.y-1);
+				if(up == null || up.isSolid())
+					break;
+				move = "up";
 				break;
-			Tile up = level.getFg(position.x, position.y-1);
-			if(up == null || up.isSolid())
+			case Keyboard.KEY_S:
+				if(position.y+1 >= level.getHeight())
+					break;
+				Tile down = level.getFg(position.x, position.y+1);
+				if(down == null || down.isSolid())
+					break;
+				move = "down";
 				break;
-			position.y--;
-			lastMoveTime = System.currentTimeMillis();
+			case Keyboard.KEY_A:
+				if(position.x-1 < 0)
+					break;
+				Tile left = level.getFg(position.x-1, position.y);
+				if(left == null || left.isSolid())
+					break;
+				move = "left";
+				break;
+			case Keyboard.KEY_D:
+				if(position.x+1 >= level.getWidth())
+					break;
+				Tile right = level.getFg(position.x+1, position.y);
+				if(right == null || right.isSolid())
+					break;
+				move = "right";
+				break;
+			default:
+				break;
+		}
+		if(!move.equals("")) {
+			int oldFacing = this.facing;
+			if(move.equals("up")) {
+				position.y--;
+				setFacing(PlayerSprite.FACING_UP);
+			}
+			else if(move.equals("right")) {
+				position.x++;
+				setFacing(PlayerSprite.FACING_RIGHT);
+			}
+			else if(move.equals("down")) {
+				position.y++;
+				setFacing(PlayerSprite.FACING_DOWN);
+			}
+			else if(move.equals("left")) {
+				position.x--;
+				setFacing(PlayerSprite.FACING_LEFT);
+			}
+			if(oldFacing == facing)
+				sprite.nextFrame();
 			placeTile(Mouse.getX(), Mouse.getY());
-			break;
-		case Keyboard.KEY_S:
-			if(position.y+1 >= level.getHeight())
-				break;
-			Tile down = level.getFg(position.x, position.y+1);
-			if(down == null || down.isSolid())
-				break;
-			position.y++;
 			lastMoveTime = System.currentTimeMillis();
-			placeTile(Mouse.getX(), Mouse.getY());
-			break;
-		case Keyboard.KEY_A:
-			if(position.x-1 < 0)
-				break;
-			Tile left = level.getFg(position.x-1, position.y);
-			if(left == null || left.isSolid())
-				break;
-			position.x--;
-			lastMoveTime = System.currentTimeMillis();
-			placeTile(Mouse.getX(), Mouse.getY());
-			break;
-		case Keyboard.KEY_D:
-			if(position.x+1 >= level.getWidth())
-				break;
-			Tile right = level.getFg(position.x+1, position.y);
-			if(right == null || right.isSolid())
-				break;
-			position.x++;
-			lastMoveTime = System.currentTimeMillis();
-			placeTile(Mouse.getX(), Mouse.getY());
-			break;
-		default:
-			break;
+		}
+		else {
+			sprite.resetFrame();
+		}
 	}
-	}
-	
-	public Texture getSprite() {
+
+	public PlayerSprite getSprite() {
 		return sprite;
 	}
 
 	public void setSprite(Texture sprite) {
-		this.sprite = sprite;
+		this.sprite = new PlayerSprite(sprite);
 	}
 
 	public Level getLevel() {
@@ -307,7 +329,8 @@ public class Player implements Renderable {
 	@Override
 	public void render(int x, int y) {
 		// Draw the player sprite
-		glEnable(GL_BLEND);
+		this.sprite.render(x, y - (PlayerSprite.PLAYER_HEIGHT - Level.TILESIZE));
+		/*glEnable(GL_BLEND);
 		sprite.bind();
 		glBegin(GL_QUADS);
 			glTexCoord2f(0, 0);
@@ -319,7 +342,7 @@ public class Player implements Renderable {
 			glTexCoord2f(0, 1);
 			glVertex2f(x, y+sprite.getTextureHeight());
 		glEnd();
-		glDisable(GL_BLEND);
+		glDisable(GL_BLEND);*/
 	}
 	
 	public void renderNameCentered() {
@@ -342,6 +365,15 @@ public class Player implements Renderable {
 	@Override
 	public void render(int x, int y, int data) {
 		render(x, y);
+	}
+
+	public int getFacing() {
+		return facing;
+	}
+
+	public void setFacing(int facing) {
+		this.facing = facing;
+		this.sprite.setFacing(facing);
 	}
 
 }
