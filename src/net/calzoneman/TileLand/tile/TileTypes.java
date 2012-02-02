@@ -41,13 +41,13 @@ public class TileTypes {
 		addBgTile(new MultidirectionalTile(7, "frozenlake", tex, new Rectangle(0, 288, 96, 96), false));
 		addBgTile(new MultidirectionalTile(8, "dirt", tex, new Rectangle(352, 0, 96, 96), false));
 		
-		addFgTile(new Tile(0, "air", null, null));
-		addFgTile(new SolidTile(1, "tree1", tex, new Rectangle(32, 128, 32, 32)));
-		addFgTile(new SolidTile(2, "tree2", tex, new Rectangle(64, 128, 32, 32)));
-		addFgTile(new SolidTile(3, "bush1", tex, new Rectangle(96, 128, 32, 32)));
-		addFgTile(new SolidTile(4, "sign1", tex, new Rectangle(128, 128, 32, 32)));
-		addFgTile(new SolidTile(5, "sign2", tex, new Rectangle(160, 128, 32, 32)));
-		addFgTile(new SolidTile(6, "sign3", tex, new Rectangle(192, 128, 32, 32)));
+		addFgTile(new Tile(0, "air", null, null, TileProperties.FOREGROUND));
+		addFgTile(new SolidTile(1, "tree1", tex, new Rectangle(32, 128, 32, 32), TileProperties.FOREGROUND));
+		addFgTile(new SolidTile(2, "tree2", tex, new Rectangle(64, 128, 32, 32), TileProperties.FOREGROUND));
+		addFgTile(new SolidTile(3, "bush1", tex, new Rectangle(96, 128, 32, 32), TileProperties.FOREGROUND));
+		addFgTile(new SolidTile(4, "sign1", tex, new Rectangle(128, 128, 32, 32), TileProperties.FOREGROUND));
+		addFgTile(new SolidTile(5, "sign2", tex, new Rectangle(160, 128, 32, 32), TileProperties.FOREGROUND));
+		addFgTile(new SolidTile(6, "sign3", tex, new Rectangle(192, 128, 32, 32), TileProperties.FOREGROUND));
 	}
 	
 	/**

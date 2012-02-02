@@ -9,4 +9,9 @@ public class SolidTile extends Tile {
 		super(id, name, tex, texPosition);
 		this.properties = TileProperties.SOLID;
 	}
+	
+	public SolidTile(int id, String name, Texture tex, Rectangle texPosition, int properties) {
+		super(id, name, tex, texPosition);
+		this.properties = TileProperties.SOLID | properties;
+	}
 }

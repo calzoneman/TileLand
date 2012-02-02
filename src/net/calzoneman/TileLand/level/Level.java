@@ -342,6 +342,20 @@ public class Level {
 			getFg(src.x, src.y - 1).updateData(foregroundLayer, new Location(src.x, src.y - 1));
 	}
 	
+	/**
+	 * General tile setting method.  Infers layer from Tile.isForeground()
+	 * @param x
+	 * @param y
+	 * @param t
+	 * @return
+	 */
+	public boolean setTile(int x, int y, Tile t) {
+		if(t.isForeground())
+			return setFg(x, y, t);
+		else
+			return setBg(x, y, t);
+	}
+	
 	public int getWidth() {
 		return width;
 	}

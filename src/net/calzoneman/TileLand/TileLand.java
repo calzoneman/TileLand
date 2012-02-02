@@ -11,6 +11,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 
 public class TileLand {
+	public static final String version = "0.15a";
 	static TextureManager tm;
 	public static void main(String[] args) {
 		StartupGUI s = new StartupGUI();
@@ -33,7 +34,7 @@ public class TileLand {
 		else level = new Level(s.selectedMapName);
 		Player ply = new Player(plyTexture, level, s.playerName);
 		s.dispose();
-		
+
 		if(!ply.getLevel().initialized) {
 			while(true) {
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
@@ -50,7 +51,6 @@ public class TileLand {
 		while(true) {
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 			Renderer.render(ply);
-			
 			Display.update();
 			ply.handleInput();
 			Display.sync(100);

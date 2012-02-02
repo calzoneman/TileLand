@@ -30,11 +30,15 @@ public class Tile implements Renderable, Holdable {
 	 * @param texPosition The Rectangle that this Tile's texture occupies in the tilesheet texture
 	 */
 	public Tile(int id, String name, Texture tex, Rectangle texPosition) {
+		this(id, name, tex, texPosition, TileProperties.NONE);
+	}
+	
+	public Tile(int id, String name, Texture tex, Rectangle texPosition, int properties) {
 		this.id = id;
 		this.name = name;
 		this.tex = tex;
 		this.texPosition = texPosition;
-		this.properties = TileProperties.NONE;
+		this.properties = properties;
 	}
 	
 	public void updateData(Layer level, Location self) { }
@@ -71,6 +75,10 @@ public class Tile implements Renderable, Holdable {
 		return (this.properties & TileProperties.SOLID) >= 1;
 	}
 	
+	public boolean isForeground() {
+		return (this.properties & TileProperties.FOREGROUND) >= 1;
+	}
+	
 	/**
 	 * Determine whether the Tile is liquid
 	 * @return true if the Tile is liquid, false otherwise
@@ -92,16 +100,13 @@ public class Tile implements Renderable, Holdable {
 	}
 
 	@Override
-	public void leftClick(Level lvl, int x, int y, boolean fgLayer) {
-		if(fgLayer)
-			lvl.setFg(x, y, this);
-		else
-			lvl.setBg(x, y, this);
+	public void leftClick(Level lvl, int x, int y) {
+		lvl.setTile(x, y, this);
 	}
 
 	@Override
-	public void rightClick(Level lvl, int x, int y, boolean fgLayer) {
-		if(fgLayer)
+	public void rightClick(Level lvl, int x, int y) {
+		if(isForeground())
 			lvl.setFg(x, y, TileTypes.getDefaultFg());
 		else
 			lvl.setBg(x, y, TileTypes.getDefaultBg());

@@ -106,7 +106,9 @@ public class Renderer {
 		Color col = transparent_green;
 		int tx = Mouse.getX() / Level.TILESIZE + renderStart.x;
 		int ty = (Display.getHeight() - Mouse.getY()) / Level.TILESIZE + renderStart.y;
-		if((tx == ply.getPosition().x && ty == ply.getPosition().y && ply.isEditingFg()) || tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight())
+		if(ply.getInventory().getEquipped() == null || (tx == ply.getPosition().x && ty == ply.getPosition().y) && 
+				(ply.getInventory().getEquipped() instanceof Tile) && ((Tile)ply.getInventory().getEquipped()).isSolid() 
+				|| tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight())
 			col = transparent_red;
 		current = ply.getCurrentTile();
 		col.bind();
@@ -114,6 +116,9 @@ public class Renderer {
 		
 		// Render the player's nametag
 		ply.renderNameCentered();
+		
+		// Render the HUD
+		ply.getInventory().getQuickbar().render();
 		// Render FPS
 		glEnable(GL_BLEND);
 		font.drawString(0, 0, "FPS: " + fps);

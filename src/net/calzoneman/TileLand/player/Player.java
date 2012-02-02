@@ -11,6 +11,8 @@ import org.newdawn.slick.UnicodeFont;
 
 import net.calzoneman.TileLand.TileLand;
 import net.calzoneman.TileLand.gfx.Renderable;
+import net.calzoneman.TileLand.inventory.Holdable;
+import net.calzoneman.TileLand.inventory.Inventory;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 import net.calzoneman.TileLand.tile.Tile;
@@ -41,6 +43,7 @@ public class Player implements Renderable {
 	private int currentMoveKey;
 	/** The time, in milliseconds, since the last movement */
 	private long lastMoveTime;
+	private Inventory inventory;
 	
 	/**
 	 * Parameterless constructor
@@ -97,6 +100,15 @@ public class Player implements Renderable {
 		this.currentMoveKey = -1;
 		this.lastMoveTime = 0;
 		this.font = TileLand.getTextureManager().getDefaultFont();
+		this.inventory = new Inventory();
+			inventory.addItem(TileTypes.getBgTile("grass1"));
+			inventory.addItem(TileTypes.getBgTile("cobbleroad"));
+			inventory.addItem(TileTypes.getFgTile("tree1"));
+			inventory.addItem(TileTypes.getFgTile("tree2"));
+			inventory.addItem(TileTypes.getFgTile("bush1"));
+			inventory.addItem(TileTypes.getFgTile("sign1"));
+			inventory.addItem(TileTypes.getFgTile("sign2"));
+			inventory.addItem(TileTypes.getFgTile("sign3"));
 	}
 	
 	public void handleInput() {
@@ -135,18 +147,20 @@ public class Player implements Renderable {
 			}
 			// Switch to the next background/foreground tile
 			if(keys[Keyboard.KEY_E]) {
-				if(editingFg) {
+				inventory.nextSlot();
+				/*if(editingFg) {
 					if(TileTypes.getFgTile(currentFg.getId()+1) != null)
 						currentFg = TileTypes.getFgTile(currentFg.getId()+1);
 				}
 				else {
 					if(TileTypes.getBgTile(currentBg.getId()+1) != null) 
 						currentBg = TileTypes.getBgTile(currentBg.getId()+1);
-				}
+				}*/
 			}
 			// Switch to the previous background/foreground tile
 			if(keys[Keyboard.KEY_Q]) {
-				if(editingFg) {
+				inventory.previousSlot();
+				/*if(editingFg) {
 					if(TileTypes.getFgTile(currentFg.getId()-1) != null)
 						currentFg = TileTypes.getFgTile(currentFg.getId()-1);
 				}
@@ -154,6 +168,7 @@ public class Player implements Renderable {
 					if(TileTypes.getBgTile(currentBg.getId()-1) != null) 
 						currentBg = TileTypes.getBgTile(currentBg.getId()-1);
 				}
+				*/
 			}
 			// Saving
 			if(keys[Keyboard.KEY_LCONTROL] && keys[Keyboard.KEY_S]) {
@@ -175,21 +190,15 @@ public class Player implements Renderable {
 		int tx = mouseX / Level.TILESIZE + offset.x;
 		int ty = (Display.getHeight() - mouseY) / Level.TILESIZE + offset.y;
 		if(!(tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight())) {
-			// Don't let the player place a solid tile on top of themselves!
-			if(!(tx == position.x && ty == position.y && (editingFg && currentFg.isSolid()))) {
-				if(editingFg) {
-					if(mouse[0])
-						level.setFg(tx, ty, currentFg);
-					else if(mouse[1])
-						level.setFg(tx, ty, TileTypes.getDefaultFg());
-				}
-				else {
-					if(mouse[0])
-						level.setBg(tx, ty, currentBg);
-					else if(mouse[1])
-						level.setBg(tx, ty, TileTypes.getDefaultBg());
-				}
-			}
+			Holdable held = inventory.getEquipped();
+			if(held == null)
+				return;
+			if(held instanceof Tile && ((Tile)held).isSolid() && tx == position.x && ty == position.y)
+				return;
+			if(mouse[0])
+				held.leftClick(level, tx, ty);
+			else if (mouse[1])
+				held.rightClick(level, tx, ty);			
 		}
 	}
 	
@@ -289,6 +298,10 @@ public class Player implements Renderable {
 	
 	public boolean isEditingFg() {
 		return this.editingFg;
+	}
+	
+	public Inventory getInventory() {
+		return this.inventory;
 	}
 
 	@Override
