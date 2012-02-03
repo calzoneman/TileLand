@@ -48,6 +48,8 @@ public class TileTypes {
 		addFgTile(new SolidTile(4, "sign1", tex, new Rectangle(128, 128, 32, 32), TileProperties.FOREGROUND));
 		addFgTile(new SolidTile(5, "sign2", tex, new Rectangle(160, 128, 32, 32), TileProperties.FOREGROUND));
 		addFgTile(new SolidTile(6, "sign3", tex, new Rectangle(192, 128, 32, 32), TileProperties.FOREGROUND));
+		addFgTile(new SolidTile(7, "rock1", tex, new Rectangle(0, 160, 32, 32), TileProperties.FOREGROUND));
+		addFgTile(new MultidirectionalTile(8, "mountain", tex, new Rectangle(320, 192, 96, 96), true, TileProperties.FOREGROUND | TileProperties.SOLID));
 	}
 	
 	/**

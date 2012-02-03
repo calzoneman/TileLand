@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
-import java.util.Random;
 
 import net.calzoneman.TileLand.tile.Tile;
 
@@ -19,8 +18,6 @@ public class Level {
 	public static final byte SAVE_VERSION = 0x03;
 	/** Constant for the dimension of a Tile texture */
 	public static final int TILESIZE = 32;
-	/** Randomizer for Level generation */
-	private Random rand;
 	/** The width of the Level, in tiles */
 	private int width = 0;
 	/** The height of the Level, in tiles */
@@ -42,11 +39,10 @@ public class Level {
 	 * @param height The height of the new map, in tiles
 	 */
 	public Level(int width, int height) {
-		this.rand = new Random();
 		this.width = width;
 		this.height = height;
-		this.backgroundLayer = new BackgroundLayer(width, height, rand);
-		this.foregroundLayer = new ForegroundLayer(width, height, rand);
+		this.backgroundLayer = new BackgroundLayer(width, height);
+		this.foregroundLayer = new ForegroundLayer(width, height);
 		this.initialized = true;
 	}
 	
@@ -66,8 +62,16 @@ public class Level {
 	 * @param filename The filename to load from, relative to saves/
 	 */
 	public Level(String filename) {
-		this.rand = new Random();
 		this.load(filename);
+	}
+	
+	public Level(Layer background, Layer foreground) {
+		this.backgroundLayer = (BackgroundLayer) background;
+		this.foregroundLayer = (ForegroundLayer) foreground;
+		this.width = background.getWidth();
+		this.height = background.getHeight();
+		this.name = "untitled";
+		this.initialized = true;
 	}
 
 	/**
@@ -378,6 +382,14 @@ public class Level {
 
 	public void setSpawnpoint(Location spawnpoint) {
 		this.spawnpoint = new Location(spawnpoint.x, spawnpoint.y);
+	}
+	
+	public String getName() {
+		return this.name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 }

@@ -105,13 +105,15 @@ public class Player implements Renderable {
 		this.font = TileLand.getTextureManager().getDefaultFont();
 		this.inventory = new Inventory();
 			inventory.addItem(TileTypes.getBgTile("grass1"));
+			inventory.addItem(TileTypes.getBgTile("snow"));
+			inventory.addItem(TileTypes.getBgTile("sand"));
 			inventory.addItem(TileTypes.getBgTile("cobbleroad"));
 			inventory.addItem(TileTypes.getFgTile("tree1"));
 			inventory.addItem(TileTypes.getFgTile("tree2"));
 			inventory.addItem(TileTypes.getFgTile("bush1"));
 			inventory.addItem(TileTypes.getFgTile("sign1"));
 			inventory.addItem(TileTypes.getFgTile("sign2"));
-			inventory.addItem(TileTypes.getFgTile("sign3"));
+			inventory.addItem(TileTypes.getFgTile("mountain"));
 	}
 	
 	public void handleInput() {
@@ -144,6 +146,16 @@ public class Player implements Renderable {
 			}
 			if(!keys[Keyboard.KEY_W] && !keys[Keyboard.KEY_S] && !keys[Keyboard.KEY_A] && !keys[Keyboard.KEY_D])
 				currentMoveKey = -1;
+			if(currentMoveKey != -1 && !keys[currentMoveKey]) {
+				if(keys[Keyboard.KEY_W])
+					currentMoveKey = Keyboard.KEY_W;
+				else if(keys[Keyboard.KEY_S])
+					currentMoveKey = Keyboard.KEY_S;
+				else if(keys[Keyboard.KEY_A])
+					currentMoveKey = Keyboard.KEY_A;
+				else if(keys[Keyboard.KEY_D])
+					currentMoveKey = Keyboard.KEY_D;
+			}
 			// Switch between foreground and background
 			if(keys[Keyboard.KEY_F]) {
 				editingFg = !editingFg;

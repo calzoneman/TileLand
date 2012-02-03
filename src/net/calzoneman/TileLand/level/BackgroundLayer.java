@@ -1,6 +1,5 @@
 package net.calzoneman.TileLand.level;
 
-import java.util.Random;
 
 import net.calzoneman.TileLand.tile.Tile;
 import net.calzoneman.TileLand.tile.TileTypes;
@@ -14,30 +13,38 @@ public class BackgroundLayer extends Layer {
 		super(width, height);
 	}
 	
-	public BackgroundLayer(int width, int height, Random random) {
-		super(width, height, random);
-	}
-	
 	public BackgroundLayer(int width, int height, short[] tiles, byte[] data) {
 		super(width, height, tiles, data);
 	}
 
 	@Override
-	public void generate(Random r) {
+	public void generate() {
+		/*
+		float[][] heightmap = new float[width][height];
+		noise.PerlinNoiseMap(heightmap, 2, 5, 0.23f, 0, 0);
+		Noise.Normalize(heightmap, 0.0f, 100.0f);
 		for(int i = 0; i < width; i++) {
 			for(int j = 0; j < height; j++) {
-				int grass = r.nextInt(100);
-				if(grass <  5) {
-					tiles[j * width + i] = (short)TileTypes.getBgTile("grass2").getId();
-				}
-				else if(grass < 10) {
-					tiles[j * width + i] = (short)TileTypes.getBgTile("grass3").getId();
-				}
-				else {
-					tiles[j * width + i] = (short)TileTypes.getBgTile("grass1").getId();
-				}
+				float n = heightmap[i][j];
+				if(n < 25)
+					setTile(i, j, TileTypes.getBgTile("lake"));
+				else if(n < 35)
+					setTile(i, j, TileTypes.getBgTile("sand"));
+				else if(n < 88)
+					setTile(i, j, TileTypes.getBgTile("grass1"));
+				else if(fg != null)
+					fg.setTile(i, j, TileTypes.getFgTile("rock"));
+				else
+					setTile(i, j, TileTypes.getBgTile("snow"));
 			}
 		}
+		
+		for(int i = 0; i < width; i++) {
+			for(int j = 0; j < height; j++) {
+				getTile(i, j).updateData(this, new Location(i, j));
+			}
+		}*/
+		tiles = new short[width * height];
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package net.calzoneman.TileLand.level;
 
-import java.util.Random;
-
 import net.calzoneman.TileLand.tile.Tile;
 
 public abstract class Layer {
@@ -21,22 +19,10 @@ public abstract class Layer {
 	 * @param height The height of the layer
 	 */
 	public Layer(int width, int height) {
-		this(width, height, new Random());
-	}
-	
-	/**
-	 * Constructor
-	 * Sets the width and height of the layer and generates map data with the given Random
-	 * @param width The width of the layer
-	 * @param height The height of the layer
-	 * @param rand The Random to be used for map generation
-	 */
-	public Layer(int width, int height, Random rand) {
 		this.width = width;
 		this.height = height;
 		this.tiles = new short[width * height];
 		this.data = new byte[width * height];
-		generate(rand);
 	}
 	
 	/**
@@ -55,11 +41,10 @@ public abstract class Layer {
 	}
 	
 	/**
-	 * Generates map data for this layer (e.g. planting trees, placing different terrain, etc.)
+	 * Generates default map data for this layer (e.g. default background, default foreground = air)
 	 * To be implemented by subclasses.
-	 * @param r The Random to be used to randomize generation
 	 */
-	public abstract void generate(Random r);
+	public abstract void generate();
 	
 	/**
 	 * Retrieves the Tile ID at (x, y), if it exists
@@ -68,7 +53,7 @@ public abstract class Layer {
 	 * @return The ID of the tile at (x, y), or -1 if the location is out-of-bounds
 	 */
 	public int getId(int x, int y) {
-		if(x < 0 || x >= width || y < 0 || y >= height)
+		if(tiles == null || x < 0 || x >= width || y < 0 || y >= height)
 			return -1;
 		return tiles[y * width + x];
 	}
@@ -90,7 +75,7 @@ public abstract class Layer {
 	 * @return True if the tile at (x, y) is set to id, else false
 	 */
 	public boolean setId(int x, int y, int id) {
-		if(x < 0 || x >= width || y < 0 || y >= height)
+		if(tiles == null || x < 0 || x >= width || y < 0 || y >= height)
 			return false;
 		tiles[y * width + x] = (short) id;
 		data[y * width + x] = 0;
@@ -115,7 +100,7 @@ public abstract class Layer {
 	 * @return The data at (x, y), or -1 if (x, y) is out-of-bounds
 	 */
 	public byte getData(int x, int y) {
-		if(x < 0 || x >= width || y < 0 || y >= height)
+		if(data == null || x < 0 || x >= width || y < 0 || y >= height)
 			return -1;
 		return data[y * width + x];
 	}
@@ -127,7 +112,7 @@ public abstract class Layer {
 	 * @return True if the data at (x, y) is set to data, false otherwise
 	 */
 	public boolean setData(int x, int y, int data) {
-		if(x < 0 || x >= width || y < 0 || y >= height)
+		if(this.data == null || x < 0 || x >= width || y < 0 || y >= height)
 			return false;
 		this.data[y * width + x] = (byte) data;
 		return true;

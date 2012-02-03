@@ -23,6 +23,11 @@ public class MultidirectionalTile extends Tile {
 		this.texPosition = orientationTextures.get(TileOrientation.CENTER);
 	}
 	
+	public MultidirectionalTile(int id, String name, Texture tex, Rectangle texPosition, boolean foreground, int properties) {
+		this(id, name, tex, texPosition, foreground);
+		this.properties |= properties;
+	}
+	
 	protected void loadOrientations(Rectangle rect) {
 		int x = (int) rect.getX();
 		int y = (int) rect.getY();

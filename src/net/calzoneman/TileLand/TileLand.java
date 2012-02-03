@@ -1,6 +1,7 @@
 package net.calzoneman.TileLand;
 
 import net.calzoneman.TileLand.gfx.Renderer;
+import net.calzoneman.TileLand.level.BasicLevelGenerator;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.player.Player;
 import net.calzoneman.TileLand.tile.TileTypes;
@@ -11,7 +12,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 
 public class TileLand {
-	public static final String version = "0.16a";
+	public static final String version = "0.17a";
 	static TextureManager tm;
 	public static void main(String[] args) {
 		StartupGUI s = new StartupGUI();
@@ -30,7 +31,10 @@ public class TileLand {
 		// Load the player sprite
 		Texture plyTexture = tm.getTexture("player.png");
 		Level level;
-		if(s.makeNewLevel) level = new Level(s.newMapSize.width, s.newMapSize.height, s.selectedMapName);
+		if(s.makeNewLevel) {
+			level = new BasicLevelGenerator().generate(s.newMapSize.width, s.newMapSize.height);//new Level(s.newMapSize.width, s.newMapSize.height, s.selectedMapName);
+			level.setName(s.selectedMapName);
+		}
 		else level = new Level(s.selectedMapName);
 		Player ply = new Player(plyTexture, level, s.playerName);
 		s.dispose();
