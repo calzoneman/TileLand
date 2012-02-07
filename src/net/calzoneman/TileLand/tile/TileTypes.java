@@ -6,7 +6,6 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.Texture;
 
 import net.calzoneman.TileLand.TileLand;
-import net.calzoneman.TileLand.player.Player;
 
 public class TileTypes {
 	/** A Dictionary of Background Tiles keyed by id */
@@ -75,7 +74,7 @@ public class TileTypes {
 	 * @return The default background tiletype
 	 */
 	public static Tile getDefaultBg() {
-		return bgTileTypes.get(0);
+		return bgTileTypes.get(8);
 	}
 	
 	/**
@@ -128,43 +127,24 @@ public class TileTypes {
 		return fgTileTypes.get(id);
 	}
 	
-	/**
-	 * Determines whether a player can place the given background Tile
-	 * @param ply The player for which the permission is requested
-	 * @param bg The id of the Tile the permission is wanted for
-	 * @return true if the player is allowed to place the Tile, false otherwise
-	 */
-	public static boolean playerCanPlaceBg(Player ply, int bg) {
+	public static boolean playerBreakableBg(int bg) {
 		switch(bg) {
-			default: return true;
+			case -1:
+			case 3:
+			case 7:
+			case 8:
+				return false;
+			default:
+				return true;
 		}
 	}
 	
-	/**
-	 * Determines whether a player can place the given foreground Tile
-	 * @param ply The player for which the permission is requested
-	 * @param fg The id of the Tile the permission is wanted for
-	 * @return true if the player is allowed to place the Tile false otherwise
-	 */
-	public static boolean playerCanPlaceFg(Player ply, int fg) {
+	public static boolean playerBreakableFg(int fg) {
 		switch(fg) {
-			default: return true;
+			case 0:
+				return false;
+			default:
+				return true;
 		}
-	}
-	
-	/**
-	 * Convenience method accepting a Tile object instead of an id
-	 * @see playerCanPlaceBg(Player ply, int bg)
-	 */
-	public static boolean playerCanPlaceBg(Player ply, Tile bg) {
-		return playerCanPlaceBg(ply, bg.getId());
-	}
-	
-	/**
-	 * Convenience method accepting a Tile object instead of an id
-	 * @see playerCanPlaceFg(Player ply, int fg)
-	 */
-	public static boolean playerCanPlaceFg(Player ply, Tile fg) {
-		return playerCanPlaceFg(ply, fg.getId());
 	}
 }

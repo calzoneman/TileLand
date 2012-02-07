@@ -10,6 +10,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.GL11.*;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.geom.Rectangle;
@@ -72,6 +73,10 @@ public class Renderer {
 		return true;
 	}
 	
+	public static UnicodeFont getFont() {
+		return font;
+	}
+	
 	/**
 	 * Renders the game
 	 * @param ply The player object for which the game is being rendered
@@ -106,8 +111,8 @@ public class Renderer {
 		Color col = transparent_green;
 		int tx = Mouse.getX() / Level.TILESIZE + renderStart.x;
 		int ty = (Display.getHeight() - Mouse.getY()) / Level.TILESIZE + renderStart.y;
-		if(ply.getInventory().getEquipped() == null || (tx == ply.getPosition().x && ty == ply.getPosition().y) && 
-				(ply.getInventory().getEquipped() instanceof Tile) && ((Tile)ply.getInventory().getEquipped()).isSolid() 
+		if(ply.getPlayerInventory().getQuickbar().getSelectedItemStack() == null || (tx == ply.getPosition().x && ty == ply.getPosition().y) && 
+				(ply.getPlayerInventory().getQuickbar().getSelectedItemStack().getItem() instanceof Tile) && ((Tile)ply.getPlayerInventory().getQuickbar().getSelectedItemStack().getItem()).isSolid() 
 				|| tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight())
 			col = transparent_red;
 		current = ply.getCurrentTile();
@@ -118,7 +123,7 @@ public class Renderer {
 		ply.renderNameCentered();
 		
 		// Render the HUD
-		ply.getInventory().getQuickbar().render();
+		ply.getPlayerInventory().getQuickbar().render();
 		// Render FPS
 		glEnable(GL_BLEND);
 		font.drawString(0, 0, "FPS: " + fps);
@@ -175,8 +180,7 @@ public class Renderer {
 		// Draw overlay
 		currentTile.render(tx * Level.TILESIZE, ty * Level.TILESIZE);
 		// Draw border
-		Color.black.bind();
-		renderRectangle(new Rectangle(tx * Level.TILESIZE, ty * Level.TILESIZE, Level.TILESIZE, Level.TILESIZE), false);
+		drawRect(tx * Level.TILESIZE, ty * Level.TILESIZE, Level.TILESIZE, Level.TILESIZE, Color.black);
 	}
 	
 	/**
@@ -227,20 +231,39 @@ public class Renderer {
 		glEnd();
 	}
 	
-	/**
-	 * Renders a rectangle
-	 * @param rect The rectangle to be rendered
-	 * @param filled Whether the rectangle is filled or solid
-	 */
-	public static void renderRectangle(Rectangle rect, boolean filled) {
-		if(filled)
-			glBegin(GL_QUADS);
-		else
-			glBegin(GL_LINE_LOOP);
-		glVertex2f(rect.getX(), rect.getY());
-		glVertex2f(rect.getX() + rect.getWidth(), rect.getY());
-		glVertex2f(rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight());
-		glVertex2f(rect.getX(), rect.getY() + rect.getHeight());
+	public static void drawFilledRect(int x, int y, int w, int h, Color col) {
+		glDisable(GL_TEXTURE_2D);
+		if(col.getAlpha() != 255)
+			glEnable(GL_BLEND);
+		col.bind();
+		glBegin(GL_QUADS);
+			glVertex2f(x, y);
+			glVertex2f(x+w, y);
+			glVertex2f(x+w, y+h);
+			glVertex2f(x, y+h);
 		glEnd();
+		if(col.getAlpha() != 255)
+			glDisable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		// Reset the color to white
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	
+	public static void drawRect(int x, int y, int w, int h, Color col) {
+		glDisable(GL_TEXTURE_2D);
+		if(col.getAlpha() != 255)
+			glEnable(GL_BLEND);
+		col.bind();
+		glBegin(GL_LINE_LOOP);
+			glVertex2f(x, y);
+			glVertex2f(x+w, y);
+			glVertex2f(x+w, y+h);
+			glVertex2f(x, y+h);
+		glEnd();
+		if(col.getAlpha() != 255)
+			glDisable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		// Reset the color to white
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 }

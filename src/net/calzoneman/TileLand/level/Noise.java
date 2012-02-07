@@ -1,7 +1,7 @@
 package net.calzoneman.TileLand.level;
 
 /**
- * Original Noise class written in C# by Matvei "fragmer" Stefarov
+ * Original Noise class written in C# by Matvei Stefarov <me@matvei.org>
  * Ported to Java by Calvin "calzoneman" Montgomery
  * Used with permission
  */

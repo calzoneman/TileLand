@@ -9,11 +9,14 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.UnicodeFont;
 
-import net.calzoneman.TileLand.TileLand;
+import net.calzoneman.TileLand.action.ActionResult;
 import net.calzoneman.TileLand.gfx.PlayerSprite;
 import net.calzoneman.TileLand.gfx.Renderable;
-import net.calzoneman.TileLand.inventory.Holdable;
+import net.calzoneman.TileLand.gfx.Renderer;
+import net.calzoneman.TileLand.inventory.Item;
 import net.calzoneman.TileLand.inventory.Inventory;
+import net.calzoneman.TileLand.inventory.ItemStack;
+import net.calzoneman.TileLand.inventory.PlayerInventory;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 import net.calzoneman.TileLand.tile.Tile;
@@ -24,8 +27,6 @@ public class Player implements Renderable {
 	private String name;
 	/** The player sprite */
 	private PlayerSprite sprite;
-	/** The font with which to render the player's nametag */
-	private UnicodeFont font;
 	/** The Level in which the Player currently exists */
 	private Level level;
 	/** The Player's position within the level */
@@ -46,7 +47,7 @@ public class Player implements Renderable {
 	private int facing = PlayerSprite.FACING_DOWN;
 	/** The time, in milliseconds, since the last movement */
 	private long lastMoveTime;
-	private Inventory inventory;
+	private PlayerInventory inventory;
 	
 	/**
 	 * Parameterless constructor
@@ -102,18 +103,11 @@ public class Player implements Renderable {
 		this.mouse = new boolean[Mouse.getButtonCount()];
 		this.currentMoveKey = -1;
 		this.lastMoveTime = 0;
-		this.font = TileLand.getTextureManager().getDefaultFont();
-		this.inventory = new Inventory();
-			inventory.addItem(TileTypes.getBgTile("grass1"));
-			inventory.addItem(TileTypes.getBgTile("snow"));
-			inventory.addItem(TileTypes.getBgTile("sand"));
-			inventory.addItem(TileTypes.getBgTile("cobbleroad"));
-			inventory.addItem(TileTypes.getFgTile("tree1"));
-			inventory.addItem(TileTypes.getFgTile("tree2"));
-			inventory.addItem(TileTypes.getFgTile("bush1"));
-			inventory.addItem(TileTypes.getFgTile("sign1"));
-			inventory.addItem(TileTypes.getFgTile("sign2"));
-			inventory.addItem(TileTypes.getFgTile("mountain"));
+		this.inventory = new PlayerInventory();
+			inventory.addItemStack(new ItemStack(TileTypes.getBgTile("snow"), 100));
+			inventory.addItemStack(new ItemStack(TileTypes.getBgTile("cobbleroad"), 100));
+			inventory.addItemStack(new ItemStack(TileTypes.getFgTile("bush1"), 100));
+			inventory.addItemStack(new ItemStack(TileTypes.getFgTile("sign2"), 100));
 	}
 	
 	public void handleInput() {
@@ -162,28 +156,11 @@ public class Player implements Renderable {
 			}
 			// Switch to the next background/foreground tile
 			if(keys[Keyboard.KEY_E]) {
-				inventory.nextSlot();
-				/*if(editingFg) {
-					if(TileTypes.getFgTile(currentFg.getId()+1) != null)
-						currentFg = TileTypes.getFgTile(currentFg.getId()+1);
-				}
-				else {
-					if(TileTypes.getBgTile(currentBg.getId()+1) != null) 
-						currentBg = TileTypes.getBgTile(currentBg.getId()+1);
-				}*/
+				inventory.getQuickbar().nextSlot();
 			}
 			// Switch to the previous background/foreground tile
 			if(keys[Keyboard.KEY_Q]) {
-				inventory.previousSlot();
-				/*if(editingFg) {
-					if(TileTypes.getFgTile(currentFg.getId()-1) != null)
-						currentFg = TileTypes.getFgTile(currentFg.getId()-1);
-				}
-				else {
-					if(TileTypes.getBgTile(currentBg.getId()-1) != null) 
-						currentBg = TileTypes.getBgTile(currentBg.getId()-1);
-				}
-				*/
+				inventory.getQuickbar().prevSlot();
 			}
 			// Saving
 			if(keys[Keyboard.KEY_LCONTROL] && keys[Keyboard.KEY_S]) {
@@ -199,22 +176,57 @@ public class Player implements Renderable {
 	private void placeTile(int mouseX, int mouseY) {
 		if(!mouse[0] && !mouse[1])
 			return;
+		// Mouse offset in the level
 		Location offset = new Location(
 				position.x - Display.getWidth() / Level.TILESIZE / 2,
 				position.y - Display.getHeight() / Level.TILESIZE / 2);
+		// tx and ty are the coordinates for the tile under the mouse cursor
 		int tx = mouseX / Level.TILESIZE + offset.x;
 		int ty = (Display.getHeight() - mouseY) / Level.TILESIZE + offset.y;
 		if(!(tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight())) {
-			Holdable held = inventory.getEquipped();
-			if(held == null)
+			Item held = null;
+			if (inventory.getQuickbar().getSelectedItemStack() != null)
+				held = inventory.getQuickbar().getSelectedItemStack().getItem();
+			ActionResult ar = null;
+			// You can't place null!  (You can break with it though)
+			if(held == null && !mouse[1])
 				return;
-			if(held instanceof Tile && ((Tile)held).isSolid() && tx == position.x && ty == position.y)
+			// Why would you even do this [placing a tile on top of you]
+			if(held instanceof Tile && ((Tile) held).isSolid() && tx == position.x && ty == position.y)
 				return;
 			if(mouse[0])
-				held.leftClick(level, tx, ty);
+				ar = held.leftClick(level, tx, ty);
+			else if (mouse[1] && held == null)
+				ar = defaultRightClick(level, tx, ty);
 			else if (mouse[1])
-				held.rightClick(level, tx, ty);			
+				ar = held.rightClick(level, tx, ty);			
+			if(ar != null && ar.getResultCode() == ActionResult.TILE_BREAK) {
+				inventory.addItem((Item) ar.getResult());
+			}
+			else if(ar != null && ar.getResultCode() == ActionResult.TILE_PLACE && ar.getResult() != null) {
+				inventory.removeOneItem(inventory.getQuickbar().getSelectedSlot());
+			}
 		}
+	}
+	
+	private ActionResult defaultRightClick(Level lvl, int x, int y) {
+		Tile fg = lvl.getFg(x, y);
+		if(fg.equals(TileTypes.getFgTile("air"))) {
+			Tile bg = lvl.getBg(x, y);
+			if(!TileTypes.playerBreakableBg(bg.getId()))
+				return new ActionResult(ActionResult.FAILURE, null);
+			else if(lvl.setTile(x, y, TileTypes.getDefaultBg()))
+				return new ActionResult(ActionResult.TILE_BREAK, bg);
+			else
+				return new ActionResult(ActionResult.FAILURE, null);
+		}
+		else if(!TileTypes.playerBreakableFg(fg.getId())) {
+			return new ActionResult(ActionResult.FAILURE, null);
+		}
+		else if (lvl.setTile(x, y, TileTypes.getDefaultFg()))
+			return new ActionResult(ActionResult.TILE_BREAK, fg);
+		else
+			return new ActionResult(ActionResult.FAILURE, null);
 	}
 	
 	private void move() {
@@ -322,16 +334,12 @@ public class Player implements Renderable {
 			return this.currentBg;
 	}
 	
-	public Tile getCurrentBg() {
-		return this.currentBg;
+	public Item getHeldItem() {
+		return this.inventory.getQuickbar().getSelectedItemStack().getItem();
 	}
 	
-	public Tile getCurrentFg() {
-		return this.currentFg;
-	}
-	
-	public boolean isEditingFg() {
-		return this.editingFg;
+	public PlayerInventory getPlayerInventory() {
+		return this.inventory;
 	}
 	
 	public Inventory getInventory() {
@@ -342,22 +350,10 @@ public class Player implements Renderable {
 	public void render(int x, int y) {
 		// Draw the player sprite
 		this.sprite.render(x, y - (PlayerSprite.PLAYER_HEIGHT - Level.TILESIZE));
-		/*glEnable(GL_BLEND);
-		sprite.bind();
-		glBegin(GL_QUADS);
-			glTexCoord2f(0, 0);
-			glVertex2f(x, y);
-			glTexCoord2f(1, 0);
-			glVertex2f(x+sprite.getTextureWidth(), y);
-			glTexCoord2f(1, 1);
-			glVertex2f(x+sprite.getTextureWidth(), y+sprite.getTextureHeight());
-			glTexCoord2f(0, 1);
-			glVertex2f(x, y+sprite.getTextureHeight());
-		glEnd();
-		glDisable(GL_BLEND);*/
 	}
 	
 	public void renderNameCentered() {
+		UnicodeFont font = Renderer.getFont();
 		int w = font.getWidth(name);
 		int h = font.getHeight(name);
 		int x = Display.getWidth()/2  - w/2 + Level.TILESIZE/2;
@@ -375,9 +371,7 @@ public class Player implements Renderable {
 	}
 	
 	@Override
-	public void render(int x, int y, int data) {
-		render(x, y);
-	}
+	public void render(int x, int y, int data) { }
 
 	public int getFacing() {
 		return facing;

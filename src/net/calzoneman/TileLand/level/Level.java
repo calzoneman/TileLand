@@ -99,7 +99,7 @@ public class Level {
 			}
 			byte[] bgData = backgroundLayer.getDataArray();
 			buf.put(bgData);
-			byte[] fgData = backgroundLayer.getDataArray();
+			byte[] fgData = foregroundLayer.getDataArray();
 			buf.put(fgData);
 			fos.write(buf.array());
 			fos.close();

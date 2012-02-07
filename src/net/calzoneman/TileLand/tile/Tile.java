@@ -1,8 +1,9 @@
 package net.calzoneman.TileLand.tile;
 
 import static org.lwjgl.opengl.GL11.*;
+import net.calzoneman.TileLand.action.ActionResult;
 import net.calzoneman.TileLand.gfx.Renderable;
-import net.calzoneman.TileLand.inventory.Holdable;
+import net.calzoneman.TileLand.inventory.Item;
 import net.calzoneman.TileLand.level.Layer;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
@@ -11,7 +12,7 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.Texture;
 
 
-public class Tile implements Renderable, Holdable {
+public class Tile extends Item implements Renderable {
 	/** The id of the tiletype.  In saves this is a short, but making it int here will save loads of unnecessary casting */
 	private int id;
 	/** A human readable string identifying the Tile */
@@ -100,16 +101,47 @@ public class Tile implements Renderable, Holdable {
 	}
 
 	@Override
-	public void leftClick(Level lvl, int x, int y) {
-		lvl.setTile(x, y, this);
+	public ActionResult leftClick(Level lvl, int x, int y) {
+		Tile before;
+		if(isForeground())
+			before = lvl.getFg(x, y);
+		else
+			before = lvl.getBg(x, y);
+		boolean worked = true;
+		if(isForeground())
+			worked = lvl.getFg(x, y) == TileTypes.getFgTile("air");
+		if(worked)
+			worked = lvl.setTile(x, y, this);
+		Tile after;
+		if(isForeground())
+			after = lvl.getFg(x, y);
+		else
+			after = lvl.getBg(x, y);
+		Tile result = null;
+		if(before != after && worked)
+			result = before;
+		return new ActionResult(ActionResult.TILE_PLACE, result);
 	}
 
 	@Override
-	public void rightClick(Level lvl, int x, int y) {
-		if(isForeground())
-			lvl.setFg(x, y, TileTypes.getDefaultFg());
+	public ActionResult rightClick(Level lvl, int x, int y) {
+		Tile fg = lvl.getFg(x, y);
+		if(fg.equals(TileTypes.getFgTile("air"))) {
+			Tile bg = lvl.getBg(x, y);
+			if(!TileTypes.playerBreakableBg(bg.getId()))
+				return new ActionResult(ActionResult.FAILURE, null);
+			else if(lvl.setTile(x, y, TileTypes.getDefaultBg()))
+				return new ActionResult(ActionResult.TILE_BREAK, bg);
+			else
+				return new ActionResult(ActionResult.FAILURE, null);
+		}
+		else if(!TileTypes.playerBreakableFg(fg.getId())) {
+			return new ActionResult(ActionResult.FAILURE, null);
+		}
+		else if (lvl.setTile(x, y, TileTypes.getDefaultFg()))
+			return new ActionResult(ActionResult.TILE_BREAK, fg);
 		else
-			lvl.setBg(x, y, TileTypes.getDefaultBg());
+			return new ActionResult(ActionResult.FAILURE, null);
 	}
 
 	@Override
