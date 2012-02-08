@@ -109,7 +109,7 @@ public class Tile extends Item implements Renderable {
 			before = lvl.getBg(x, y);
 		boolean worked = true;
 		if(isForeground())
-			worked = lvl.getFg(x, y) == TileTypes.getFgTile("air");
+			worked = lvl.getFgId(x, y) == TileId.AIR;
 		if(worked)
 			worked = lvl.setTile(x, y, this);
 		Tile after;
@@ -125,21 +125,21 @@ public class Tile extends Item implements Renderable {
 
 	@Override
 	public ActionResult rightClick(Level lvl, int x, int y) {
-		Tile fg = lvl.getFg(x, y);
-		if(fg.equals(TileTypes.getFgTile("air"))) {
-			Tile bg = lvl.getBg(x, y);
-			if(!TileTypes.playerBreakableBg(bg.getId()))
+		int fg = lvl.getFgId(x, y);
+		if(fg == TileId.AIR) {
+			int bg = lvl.getBgId(x, y);
+			if(!TileTypes.playerBreakable(bg))
 				return new ActionResult(ActionResult.FAILURE, null);
 			else if(lvl.setTile(x, y, TileTypes.getDefaultBg()))
-				return new ActionResult(ActionResult.TILE_BREAK, bg);
+				return new ActionResult(ActionResult.TILE_BREAK, TileTypes.getTile(bg));
 			else
 				return new ActionResult(ActionResult.FAILURE, null);
 		}
-		else if(!TileTypes.playerBreakableFg(fg.getId())) {
+		else if(!TileTypes.playerBreakable(fg)) {
 			return new ActionResult(ActionResult.FAILURE, null);
 		}
 		else if (lvl.setTile(x, y, TileTypes.getDefaultFg()))
-			return new ActionResult(ActionResult.TILE_BREAK, fg);
+			return new ActionResult(ActionResult.TILE_BREAK, TileTypes.getTile(fg));
 		else
 			return new ActionResult(ActionResult.FAILURE, null);
 	}

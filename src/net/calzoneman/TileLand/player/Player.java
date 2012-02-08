@@ -20,6 +20,7 @@ import net.calzoneman.TileLand.inventory.PlayerInventory;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 import net.calzoneman.TileLand.tile.Tile;
+import net.calzoneman.TileLand.tile.TileId;
 import net.calzoneman.TileLand.tile.TileTypes;
 
 public class Player implements Renderable {
@@ -31,10 +32,6 @@ public class Player implements Renderable {
 	private Level level;
 	/** The Player's position within the level */
 	private Location position;
-	/** The current background Tile the Player is holding */
-	private Tile currentBg;
-	/** The current foreground Tile the Player is holding */
-	private Tile currentFg;
 	/** Whether the player is currently editing the foreground */
 	private boolean editingFg;
 	/** An array keeping the key states of the keyboard */
@@ -96,18 +93,16 @@ public class Player implements Renderable {
 		this.setLevel(level);
 		this.setName(name);
 		this.setPosition(position);
-		this.currentBg = TileTypes.getDefaultBg();
-		this.currentFg = TileTypes.getFgTile("tree1");
 		this.editingFg = false;
 		this.keys = new boolean[256]; // Keyboard.getKeyCount() seems to have issues...
 		this.mouse = new boolean[Mouse.getButtonCount()];
 		this.currentMoveKey = -1;
 		this.lastMoveTime = 0;
 		this.inventory = new PlayerInventory();
-			inventory.addItemStack(new ItemStack(TileTypes.getBgTile("snow"), 100));
-			inventory.addItemStack(new ItemStack(TileTypes.getBgTile("cobbleroad"), 100));
-			inventory.addItemStack(new ItemStack(TileTypes.getFgTile("bush1"), 100));
-			inventory.addItemStack(new ItemStack(TileTypes.getFgTile("sign2"), 100));
+			inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.SNOWY_GRASS), 100));
+			inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.COBBLESTONE_ROAD), 100));
+			inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.BUSH), 100));
+			inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.SIGN), 100));
 	}
 	
 	public void handleInput() {
@@ -210,21 +205,21 @@ public class Player implements Renderable {
 	}
 	
 	private ActionResult defaultRightClick(Level lvl, int x, int y) {
-		Tile fg = lvl.getFg(x, y);
-		if(fg.equals(TileTypes.getFgTile("air"))) {
-			Tile bg = lvl.getBg(x, y);
-			if(!TileTypes.playerBreakableBg(bg.getId()))
+		int fg = lvl.getFgId(x, y);
+		if(fg == TileId.AIR) {
+			int bg = lvl.getBgId(x, y);
+			if(!TileTypes.playerBreakable(bg))
 				return new ActionResult(ActionResult.FAILURE, null);
 			else if(lvl.setTile(x, y, TileTypes.getDefaultBg()))
-				return new ActionResult(ActionResult.TILE_BREAK, bg);
+				return new ActionResult(ActionResult.TILE_BREAK, TileTypes.getTile(bg));
 			else
 				return new ActionResult(ActionResult.FAILURE, null);
 		}
-		else if(!TileTypes.playerBreakableFg(fg.getId())) {
+		else if(!TileTypes.playerBreakable(fg)) {
 			return new ActionResult(ActionResult.FAILURE, null);
 		}
 		else if (lvl.setTile(x, y, TileTypes.getDefaultFg()))
-			return new ActionResult(ActionResult.TILE_BREAK, fg);
+			return new ActionResult(ActionResult.TILE_BREAK, TileTypes.getTile(fg));
 		else
 			return new ActionResult(ActionResult.FAILURE, null);
 	}
@@ -325,13 +320,6 @@ public class Player implements Renderable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	public Tile getCurrentTile() {
-		if(editingFg)
-			return this.currentFg;
-		else
-			return this.currentBg;
 	}
 	
 	public Item getHeldItem() {

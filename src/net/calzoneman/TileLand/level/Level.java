@@ -15,7 +15,7 @@ public class Level {
 	/** The magic number for the level header */
 	public static final int SAVE_MAGIC = 0x54494c45; // "TILE" in ASCII hex
 	/** The file format version */
-	public static final byte SAVE_VERSION = 0x03;
+	public static final byte SAVE_VERSION = 0x04;
 	/** Constant for the dimension of a Tile texture */
 	public static final int TILESIZE = 32;
 	/** The width of the Level, in tiles */

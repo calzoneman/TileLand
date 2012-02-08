@@ -9,6 +9,7 @@ public class ItemStack implements Cloneable, Renderable {
 	public static final int MAX_STACK_SIZE = 100;
 	
 	private Item item;
+	private byte data;
 	private int count;
 	
 	public ItemStack(Item it) {
@@ -30,8 +31,16 @@ public class ItemStack implements Cloneable, Renderable {
 		return item;
 	}
 	
+	public byte getData() {
+		return data;
+	}
+	
 	public int getCount() {
 		return count;
+	}
+	
+	public void setData(int data) { 
+		this.data = (byte) data;
 	}
 	
 	public void setCount(int count) {

@@ -1,6 +1,7 @@
 package net.calzoneman.TileLand.level;
 
 import net.calzoneman.TileLand.tile.Tile;
+import net.calzoneman.TileLand.tile.TileTypes;
 
 public abstract class Layer {
 	/** An array of IDs of tiles stored in this Layer */
@@ -60,12 +61,13 @@ public abstract class Layer {
 	
 	/**
 	 * Retrieves the Tile at (x, y), if it exists
-	 * To be implemented by subclasses.
 	 * @param x The x-coordinate of the tile to retrieve
 	 * @param y The y-coordinate of the tile to retrieve
 	 * @return The Tile for the ID at (x, y), null if the location is out-of-bounds, or null if such a Tile does not exist
 	 */
-	public abstract Tile getTile(int x, int y);
+	public Tile getTile(int x, int y) {
+		return TileTypes.getTile(getId(x, y));
+	}
 	
 	/**
 	 * Sets the Tile ID at (x, y)

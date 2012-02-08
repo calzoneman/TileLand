@@ -1,6 +1,8 @@
 package net.calzoneman.TileLand.gfx;
 
 import net.calzoneman.TileLand.TileLand;
+import net.calzoneman.TileLand.inventory.Item;
+import net.calzoneman.TileLand.inventory.ItemStack;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 import net.calzoneman.TileLand.player.Player;
@@ -77,13 +79,15 @@ public class Renderer {
 		return font;
 	}
 	
+	public static void setFont(UnicodeFont fnt) {
+		font = fnt;
+	}
+	
 	/**
 	 * Renders the game
 	 * @param ply The player object for which the game is being rendered
 	 */
 	public static void render(Player ply) {
-		if(font == null)
-			font = TileLand.getTextureManager().getDefaultFont();
 		if(System.nanoTime() >= lastFPSMeasureTime + 1000000000) {
 			fps = (int) currentFrames;
 			currentFrames = 0;
@@ -107,17 +111,20 @@ public class Renderer {
 			renderLevel(level, renderStart.x, renderStart.y, Display.getWidth() / Level.TILESIZE, Display.getHeight() / Level.TILESIZE, true);
 		}
 		// Render the mouse hover
-		Tile current = null;
+		ItemStack current = null;
 		Color col = transparent_green;
 		int tx = Mouse.getX() / Level.TILESIZE + renderStart.x;
 		int ty = (Display.getHeight() - Mouse.getY()) / Level.TILESIZE + renderStart.y;
-		if(ply.getPlayerInventory().getQuickbar().getSelectedItemStack() == null || (tx == ply.getPosition().x && ty == ply.getPosition().y) && 
-				(ply.getPlayerInventory().getQuickbar().getSelectedItemStack().getItem() instanceof Tile) && ((Tile)ply.getPlayerInventory().getQuickbar().getSelectedItemStack().getItem()).isSolid() 
-				|| tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight())
+		if(ply.getPlayerInventory().getQuickbar().getSelectedItemStack() == null // Selected item is null
+				|| (tx == ply.getPosition().x && ty == ply.getPosition().y) // Cursor is over the player
+				|| tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight()) // Mouse it outside the bounds of the Level
 			col = transparent_red;
-		current = ply.getCurrentTile();
+		current = ply.getPlayerInventory().getQuickbar().getSelectedItemStack();
 		col.bind();
-		renderMouse(current);
+		if(current != null)
+			renderMouse(current.getItem());
+		else
+			renderMouse(null);
 		
 		// Render the player's nametag
 		ply.renderNameCentered();
@@ -170,15 +177,15 @@ public class Renderer {
 	/**
 	 * Renders the mouse hover
 	 */
-	public static void renderMouse(Tile currentTile) {
-		if(currentTile == null)
+	public static void renderMouse(Item currentItem) {
+		if(currentItem == null)
 			return;
 		int mx = Mouse.getX();
 		int my = Mouse.getY();
 		int tx = mx / Level.TILESIZE;
 		int ty = (Display.getHeight() - my) / Level.TILESIZE;
 		// Draw overlay
-		currentTile.render(tx * Level.TILESIZE, ty * Level.TILESIZE);
+		currentItem.render(tx * Level.TILESIZE, ty * Level.TILESIZE);
 		// Draw border
 		drawRect(tx * Level.TILESIZE, ty * Level.TILESIZE, Level.TILESIZE, Level.TILESIZE, Color.black);
 	}
@@ -265,5 +272,14 @@ public class Renderer {
 		glEnable(GL_TEXTURE_2D);
 		// Reset the color to white
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	
+	public static void drawString(int x, int y, String str, Color col) {
+		font.drawString(x, y, str, col);
+	}
+	
+	public static void drawCenteredString(int y, String str, Color col) {
+		int w = font.getWidth(str);
+		drawString(Display.getWidth()/2-w/2, y, str, col);
 	}
 }

@@ -1,6 +1,6 @@
 package net.calzoneman.TileLand.level;
 
-import net.calzoneman.TileLand.tile.TileTypes;
+import net.calzoneman.TileLand.tile.TileId;
 
 public class BasicLevelGenerator extends LevelGenerator {
 	
@@ -18,6 +18,9 @@ public class BasicLevelGenerator extends LevelGenerator {
 		short[] bgTiles = new short[width * height];
 		short[] fgTiles = new short[width * height];
 		
+		byte[] bgData = new byte[width * height];
+		byte[] fgData = new byte[width * height];
+		
 		// Generate terrain
 		float[][] heightmap = new float[width][height];
 		n.PerlinNoiseMap(heightmap, 2, 5, 0.23f, 0, 0);
@@ -28,27 +31,21 @@ public class BasicLevelGenerator extends LevelGenerator {
 				float ht = heightmap[i][j];
 				int index = j * width + i;
 				if(ht < 20.0f) {
-					bgTiles[index] = (short) TileTypes.getBgTile("lake").getId();
+					bgTiles[index] = TileId.LAKE;
 					if(ht < 17.5f && rand.nextFloat() < 0.04f)
-						fgTiles[index] = (short) TileTypes.getFgTile("rock1").getId();
+						fgTiles[index] = TileId.ROCK_1;
 				}
 				else if(ht < 25.0f)
-					bgTiles[index] = (short) TileTypes.getBgTile("sand").getId();
+					bgTiles[index] = TileId.SAND;
 				else if(ht < 84.0f) {
-					switch(rand.nextInt(3)) {
-						case 0:
-							bgTiles[index] = (short) TileTypes.getBgTile("grass1").getId();
-							break;
-						case 1:
-							bgTiles[index] = (short) TileTypes.getBgTile("grass2").getId();
-							break;
-						default:
-							bgTiles[index] = (short) TileTypes.getBgTile("grass3").getId();
-							break;
-					}
+					bgTiles[index] = TileId.GRASS;
+					bgData[index] = (byte) rand.nextInt(9);
 				}
-				else
-					fgTiles[index] = (short) TileTypes.getFgTile("mountain").getId();
+				else {
+					fgTiles[index] = TileId.MOUNTAIN;
+					bgTiles[index] = TileId.GRASS;
+					bgData[index] = (byte) rand.nextInt(9);
+				}
 			}
 		}
 		
@@ -62,14 +59,11 @@ public class BasicLevelGenerator extends LevelGenerator {
 			for(int j = 0; j < height; j++) {
 				float ht = treemap[i][j];
 				int index = j * width + i;
-				if(ht > 75.0f && (fgTiles[index] == 0) && 
-						(bgTiles[index] == (short) TileTypes.getBgTile("grass1").getId() ||
-						bgTiles[index] == (short) TileTypes.getBgTile("grass2").getId() ||
-						bgTiles[index] == (short) TileTypes.getBgTile("grass3").getId())) {
+				if(ht > 75.0f && (fgTiles[index] == 0) && bgTiles[index] == TileId.GRASS) {
 					if(rand.nextInt(2) == 0)
-						fgTiles[index] = (short) TileTypes.getFgTile("tree1").getId();
+						fgTiles[index] = TileId.TREE_1;
 					else
-						fgTiles[index] = (short) TileTypes.getFgTile("tree2").getId();
+						fgTiles[index] = TileId.TREE_2;
 				}
 			}
 		}
@@ -77,45 +71,44 @@ public class BasicLevelGenerator extends LevelGenerator {
 		
 		// Fix up mountains
 		// Removes mountain pieces that are only connected to zero or one other mountain piece
-		final short MOUNTAIN = (short) TileTypes.getFgTile("mountain").getId();
 		int i = 0;
 		int j = 0;
 		while(i < width) {
 			while(j < height) {
 				int index = j * width + i;
-				if(fgTiles[index] == MOUNTAIN) {
-					if(getTile(fgTiles, (j-1) * width + i) == MOUNTAIN &&
-							getTile(fgTiles, (j+1) * width + i) != MOUNTAIN &&
-							getTile(fgTiles, j * width + i-1) != MOUNTAIN &&
-							getTile(fgTiles, j * width + i+1) != MOUNTAIN) {
+				if(fgTiles[index] == TileId.MOUNTAIN) {
+					if(getTile(fgTiles, (j-1) * width + i) == TileId.MOUNTAIN &&
+							getTile(fgTiles, (j+1) * width + i) != TileId.MOUNTAIN &&
+							getTile(fgTiles, j * width + i-1) != TileId.MOUNTAIN &&
+							getTile(fgTiles, j * width + i+1) != TileId.MOUNTAIN) {
 						fgTiles[index] = 0;
 						j--;
 					}
-					else if(getTile(fgTiles, (j+1) * width + i) == MOUNTAIN &&
-							getTile(fgTiles, (j-1) * width + i) != MOUNTAIN &&
-							getTile(fgTiles, j * width + i-1) != MOUNTAIN &&
-							getTile(fgTiles, j * width + i+1) != MOUNTAIN) {
+					else if(getTile(fgTiles, (j+1) * width + i) == TileId.MOUNTAIN &&
+							getTile(fgTiles, (j-1) * width + i) != TileId.MOUNTAIN &&
+							getTile(fgTiles, j * width + i-1) != TileId.MOUNTAIN &&
+							getTile(fgTiles, j * width + i+1) != TileId.MOUNTAIN) {
 						fgTiles[index] = 0;
 						j++;
 					}
-					else if(getTile(fgTiles, j * width + i-1) == MOUNTAIN &&
-							getTile(fgTiles, (j-1) * width + i) != MOUNTAIN &&
-							getTile(fgTiles, (j+1) * width + i) != MOUNTAIN &&
-							getTile(fgTiles, j * width + i+1) != MOUNTAIN) {
+					else if(getTile(fgTiles, j * width + i-1) == TileId.MOUNTAIN &&
+							getTile(fgTiles, (j-1) * width + i) != TileId.MOUNTAIN &&
+							getTile(fgTiles, (j+1) * width + i) != TileId.MOUNTAIN &&
+							getTile(fgTiles, j * width + i+1) != TileId.MOUNTAIN) {
 						fgTiles[index] = 0;
 						i--;
 					}
-					else if(getTile(fgTiles, j * width + i+1) == MOUNTAIN &&
-							getTile(fgTiles, (j-1) * width + i) != MOUNTAIN &&
-							getTile(fgTiles, (j+1) * width + i) != MOUNTAIN &&
-							getTile(fgTiles, j * width + i-1) != MOUNTAIN) {
+					else if(getTile(fgTiles, j * width + i+1) == TileId.MOUNTAIN &&
+							getTile(fgTiles, (j-1) * width + i) != TileId.MOUNTAIN &&
+							getTile(fgTiles, (j+1) * width + i) != TileId.MOUNTAIN &&
+							getTile(fgTiles, j * width + i-1) != TileId.MOUNTAIN) {
 						fgTiles[index] = 0;
 						i++;
 					}
-					else if(getTile(fgTiles, j * width + i+1) != MOUNTAIN &&
-							getTile(fgTiles, (j-1) * width + i) != MOUNTAIN &&
-							getTile(fgTiles, (j+1) * width + i) != MOUNTAIN &&
-							getTile(fgTiles, j * width + i-1) != MOUNTAIN) {
+					else if(getTile(fgTiles, j * width + i+1) != TileId.MOUNTAIN &&
+							getTile(fgTiles, (j-1) * width + i) != TileId.MOUNTAIN &&
+							getTile(fgTiles, (j+1) * width + i) != TileId.MOUNTAIN &&
+							getTile(fgTiles, j * width + i-1) != TileId.MOUNTAIN) {
 						fgTiles[index] = 0;
 						j++;
 					}
@@ -132,8 +125,8 @@ public class BasicLevelGenerator extends LevelGenerator {
 		}
 		
 		// Set up layers
-		bg = new BackgroundLayer(width, height, bgTiles, new byte[width*height]);
-		fg = new ForegroundLayer(width, height, fgTiles, new byte[width*height]);
+		bg = new BackgroundLayer(width, height, bgTiles, bgData);
+		fg = new ForegroundLayer(width, height, fgTiles, fgData);
 		
 		// Process tile data
 		for(i = 0; i < width; i++) {

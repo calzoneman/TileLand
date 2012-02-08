@@ -20,9 +20,4 @@ public class ForegroundLayer extends Layer {
 	public void generate() {
 		tiles = new short[width * height];
 	}
-
-	@Override
-	public Tile getTile(int x, int y) {
-		return TileTypes.getFgTile(getId(x, y));
-	}
 }
