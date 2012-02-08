@@ -12,7 +12,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 
 public class TileLand {
-	public static final String version = "0.18a_01";
+	public static final String version = "0.18a_02";
 	static TextureManager tm;
 	public static void main(String[] args) {
 		StartupGUI s = new StartupGUI();
@@ -39,12 +39,12 @@ public class TileLand {
 		else level = new Level(s.selectedMapName);
 		Player ply = new Player(plyTexture, level, s.playerName);
 		s.dispose();
-
+		
 		if(!ply.getLevel().initialized) {
 			while(true) {
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-				Renderer.drawCenteredString(Display.getHeight()/2, "Uh Oh!  The level is broken!", Color.red);
-				Renderer.drawCenteredString(Display.getHeight()/2 + 10, "Make sure it's not an outdated file!", Color.red);
+				Renderer.renderScreenCenteredString(Display.getHeight()/2, "Uh Oh!  The level is broken!", Color.red);
+				Renderer.renderScreenCenteredString(Display.getHeight()/2 + 10, "Make sure it's not an outdated file!", Color.red);
 				Display.update();
 				if(Display.isCloseRequested()) {
 					Display.destroy();

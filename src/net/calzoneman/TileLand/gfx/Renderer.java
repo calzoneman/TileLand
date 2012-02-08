@@ -20,7 +20,7 @@ import org.newdawn.slick.opengl.Texture;
 
 public class Renderer {
 	/** The font to be used for text drawing */
-	private static UnicodeFont font;
+	private static TilelandFont font;
 	/** FPS counter variables */
 	private static long lastFPSMeasureTime;
 	private static long currentFrames;
@@ -75,12 +75,12 @@ public class Renderer {
 		return true;
 	}
 	
-	public static UnicodeFont getFont() {
+	public static TilelandFont getFont() {
 		return font;
 	}
 	
 	public static void setFont(UnicodeFont fnt) {
-		font = fnt;
+		font = new TilelandFont(fnt);
 	}
 	
 	/**
@@ -187,17 +187,18 @@ public class Renderer {
 		// Draw overlay
 		currentItem.render(tx * Level.TILESIZE, ty * Level.TILESIZE);
 		// Draw border
-		drawRect(tx * Level.TILESIZE, ty * Level.TILESIZE, Level.TILESIZE, Level.TILESIZE, Color.black);
+		renderRect(tx * Level.TILESIZE, ty * Level.TILESIZE, Level.TILESIZE, Level.TILESIZE, Color.black);
 	}
 	
 	/**
 	 * Renders a Texture at the specified coordinates
+	 * @param tex The texture to be drawn
 	 * @param x The x-coordinate at which to render the texture
 	 * @param y The y-coordinate at which to render the texture
 	 */
-	@Deprecated
 	public static void renderTexture(Texture tex, int x, int y) {
 		tex.bind();
+		glEnable(GL_BLEND);
 		glBegin(GL_QUADS);
 			glTexCoord2f(0, 0);
 			glVertex2f(x, y);
@@ -208,6 +209,7 @@ public class Renderer {
 			glTexCoord2f(0, 1);
 			glVertex2f(x, y+tex.getTextureHeight());
 		glEnd();
+		glDisable(GL_BLEND);
 	}
 	
 	/**
@@ -217,7 +219,6 @@ public class Renderer {
 	 * @param x The x coordinate at which to draw the rectangle
 	 * @param y The y coordinate at which to draw the rectangle
 	 */
-	@Deprecated
 	public static void renderTextureSubrectangle(Texture tex, Rectangle rect, int x, int y) {
 		int texWidth = tex.getTextureWidth();
 		int texHeight = tex.getTextureHeight();
@@ -226,6 +227,7 @@ public class Renderer {
 		float rectWidth = rect.getWidth();
 		float rectHeight = rect.getHeight();
 		tex.bind();
+		glEnable(GL_BLEND);
 		glBegin(GL_QUADS);
 			glTexCoord2f(rectX / texWidth, rectY / texHeight);
 			glVertex2f(x, y);
@@ -236,11 +238,12 @@ public class Renderer {
 			glTexCoord2f(rectX / texWidth, (rectY + rectHeight) / texHeight);
 			glVertex2f(x, y + rectHeight);
 		glEnd();
+		glDisable(GL_BLEND);
 	}
 	
-	public static void drawFilledRect(int x, int y, int w, int h, Color col) {
+	public static void renderFilledRect(int x, int y, int w, int h, Color col) {
 		glDisable(GL_TEXTURE_2D);
-		if(col.getAlpha() != 255)
+	    if(col.getAlpha() != 255)
 			glEnable(GL_BLEND);
 		col.bind();
 		glBegin(GL_QUADS);
@@ -256,7 +259,7 @@ public class Renderer {
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	
-	public static void drawRect(int x, int y, int w, int h, Color col) {
+	public static void renderRect(int x, int y, int w, int h, Color col) {
 		glDisable(GL_TEXTURE_2D);
 		if(col.getAlpha() != 255)
 			glEnable(GL_BLEND);
@@ -274,12 +277,12 @@ public class Renderer {
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 	
-	public static void drawString(int x, int y, String str, Color col) {
-		font.drawString(x, y, str, col);
+	public static void renderString(int x, int y, String str, Color bgcolor) {
+		font.drawString(x, y, str, bgcolor);
 	}
 	
-	public static void drawCenteredString(int y, String str, Color col) {
+	public static void renderScreenCenteredString(int y, String str, Color bgcolor) {
 		int w = font.getWidth(str);
-		drawString(Display.getWidth()/2-w/2, y, str, col);
+		renderString(Display.getWidth()/2-w/2, y, str, bgcolor);
 	}
 }

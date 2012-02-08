@@ -4,6 +4,7 @@ import org.newdawn.slick.Color;
 
 import net.calzoneman.TileLand.gfx.Renderable;
 import net.calzoneman.TileLand.gfx.Renderer;
+import net.calzoneman.TileLand.gfx.TilelandFont;
 
 public class ItemStack implements Cloneable, Renderable {
 	public static final int MAX_STACK_SIZE = 100;
@@ -62,7 +63,7 @@ public class ItemStack implements Cloneable, Renderable {
 		
 		// Draw the count
 		if(count > 1)
-			Renderer.getFont().drawString(x, y, ((Integer) count).toString(), Color.yellow);
+			Renderer.getFont().drawString(x, y, TilelandFont.TEXT_YELLOW + count);
 	}
 
 	@Override

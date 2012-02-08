@@ -1,13 +1,11 @@
 package net.calzoneman.TileLand.player;
 
-import static org.lwjgl.opengl.GL11.*;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.Color;
-import org.newdawn.slick.UnicodeFont;
 
 import net.calzoneman.TileLand.action.ActionResult;
 import net.calzoneman.TileLand.gfx.PlayerSprite;
@@ -319,6 +317,8 @@ public class Player implements Renderable {
 	}
 
 	public void setName(String name) {
+		if(name.equals("calzoneman"))
+			name = "«9calzoneman";
 		this.name = name;
 	}
 	
@@ -341,11 +341,12 @@ public class Player implements Renderable {
 	}
 	
 	public void renderNameCentered() {
-		UnicodeFont font = Renderer.getFont();
-		int w = font.getWidth(name);
-		int h = font.getHeight(name);
+		int w = Renderer.getFont().getWidth(name);
+		int h = Renderer.getFont().getHeight(name);
 		int x = Display.getWidth()/2  - w/2 + Level.TILESIZE/2;
 		int y = Display.getHeight()/2 - h - Level.TILESIZE;
+		Renderer.renderString(x, y, name, Color.black);
+		/*
 		Color.black.bind();
 		glBegin(GL_QUADS);
 			glVertex2f(x, y);
@@ -355,7 +356,7 @@ public class Player implements Renderable {
 		glEnd();
 		glEnable(GL_BLEND);
 		font.drawString(x, y, name);
-		glDisable(GL_BLEND);
+		glDisable(GL_BLEND);*/
 	}
 	
 	@Override

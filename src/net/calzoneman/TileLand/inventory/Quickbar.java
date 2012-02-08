@@ -69,18 +69,18 @@ public class Quickbar extends GUIComponent {
 	@Override
 	public void render() {
 		// Draw the quickbar's background
-		Renderer.drawFilledRect(this.x, this.y, this.width, this.height, barBgColor);
+		Renderer.renderFilledRect(this.x, this.y, this.width, this.height, barBgColor);
 		for(int i = 0; i < QUICKBAR_COUNT; i++) {
 			int x = this.x + 5*(i+1) + i*32;
 			int y = this.y + 5;
 			// Draw the slot background
-			Renderer.drawFilledRect(x, y, 32, 32, slotBgColor);
+			Renderer.renderFilledRect(x, y, 32, 32, slotBgColor);
 			// Draw the contents (where applicable)
 			if(contents[i] != null)
 				contents[i].render(x, y);
 			// Draw the selection border
 			if(i == selected)
-				Renderer.drawRect(x, y, 32, 32, Color.green);
+				Renderer.renderRect(x, y, 32, 32, Color.green);
 		}
 	}
 }
