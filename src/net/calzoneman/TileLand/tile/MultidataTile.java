@@ -39,6 +39,10 @@ public class MultidataTile extends Tile {
 		}
 	}
 	
+	public int getNumStates() {
+		return states.size();
+	}
+	
 	@Override
 	public void render(int x, int y) {
 		render(x, y, 0);

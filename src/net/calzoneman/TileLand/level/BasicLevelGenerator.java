@@ -1,6 +1,8 @@
 package net.calzoneman.TileLand.level;
 
 import net.calzoneman.TileLand.tile.TileId;
+import net.calzoneman.TileLand.tile.TileTypes;
+import net.calzoneman.TileLand.tile.MultidataTile;
 
 public class BasicLevelGenerator extends LevelGenerator {
 	
@@ -39,12 +41,12 @@ public class BasicLevelGenerator extends LevelGenerator {
 					bgTiles[index] = TileId.SAND;
 				else if(ht < 84.0f) {
 					bgTiles[index] = TileId.GRASS;
-					bgData[index] = (byte) rand.nextInt(9);
+					bgData[index] = (byte) rand.nextInt(((MultidataTile) TileTypes.getTile(TileId.GRASS)).getNumStates());
 				}
 				else {
 					fgTiles[index] = TileId.MOUNTAIN;
 					bgTiles[index] = TileId.GRASS;
-					bgData[index] = (byte) rand.nextInt(9);
+					bgData[index] = (byte) rand.nextInt(((MultidataTile) TileTypes.getTile(TileId.GRASS)).getNumStates());
 				}
 			}
 		}

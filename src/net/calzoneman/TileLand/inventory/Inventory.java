@@ -54,21 +54,12 @@ public class Inventory {
 			return null;
 		// Don't screw up the original
 		it = it.clone();
-		// Check for empty slots first
-		for(int i = 0; i < size; i++) {
-			ItemStack current = getItemStack(i);
-			if(current == null) {
-				setItemStack(i, it);
-				return null;
-			}
-		}
-		
-		// No?  Well try filling up other slots
+		// Try filling up other slots
 		for(int i = 0; i < size; i++) {
 			ItemStack current = getItemStack(i);
 			if(current == null)
 				continue;
-			if(current.getItem().equals(it.getItem())) {
+			if(current.getItem().equals(it.getItem()) && current.getData() == it.getData()) {
 				int count = ItemStack.MAX_STACK_SIZE - current.getCount();
 				if(count > 0) {
 					if(it.getCount() <= count) {
@@ -82,6 +73,17 @@ public class Inventory {
 				}
 			}
 		}
+		
+		// Check for empty slots
+		for(int i = 0; i < size; i++) {
+			ItemStack current = getItemStack(i);
+			if(current == null) {
+				setItemStack(i, it);
+				return null;
+			}
+		}
+		
+		
 		
 		// Well, we filled everything up and there's still some left over
 		return it;

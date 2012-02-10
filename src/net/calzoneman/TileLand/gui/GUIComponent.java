@@ -1,10 +1,15 @@
 package net.calzoneman.TileLand.gui;
 
+import java.util.ArrayList;
+
+
 public abstract class GUIComponent {
 	protected int x;
 	protected int y;
 	protected int width;
 	protected int height;
+	
+	protected ArrayList<GUIComponent> children;
 	
 	public GUIComponent(int x, int y, int width, int height) {
 		this.x = x;

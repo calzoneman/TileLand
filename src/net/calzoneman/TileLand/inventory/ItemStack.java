@@ -1,7 +1,5 @@
 package net.calzoneman.TileLand.inventory;
 
-import org.newdawn.slick.Color;
-
 import net.calzoneman.TileLand.gfx.Renderable;
 import net.calzoneman.TileLand.gfx.Renderer;
 import net.calzoneman.TileLand.gfx.TilelandFont;
@@ -16,6 +14,7 @@ public class ItemStack implements Cloneable, Renderable {
 	public ItemStack(Item it) {
 		this.item = it;
 		this.count = 1;
+		this.data = 0;
 	}
 	
 	public ItemStack(Item it, int count) {
@@ -26,6 +25,18 @@ public class ItemStack implements Cloneable, Renderable {
 			this.count = count;
 		else
 			this.count = MAX_STACK_SIZE;
+		this.data = 0;
+	}
+	
+	public ItemStack(Item it, int count, int data) {
+		this.item = it;
+		if(count < 0)
+			count = 0;
+		else if(count <= MAX_STACK_SIZE)
+			this.count = count;
+		else
+			this.count = MAX_STACK_SIZE;
+		this.data = (byte) data;
 	}
 	
 	public Item getItem() {
@@ -51,14 +62,14 @@ public class ItemStack implements Cloneable, Renderable {
 	
 	@Override
 	public ItemStack clone() {
-		return new ItemStack(item, count);
+		return new ItemStack(item, count, data);
 	}
 
 	@Override
 	public void render(int x, int y) {
 		// Draw the item
 		if(item != null) {
-			item.render(x, y);
+			item.render(x, y, data);
 		}
 		
 		// Draw the count

@@ -4,9 +4,11 @@ import static org.lwjgl.opengl.GL11.*;
 import net.calzoneman.TileLand.action.ActionResult;
 import net.calzoneman.TileLand.gfx.Renderable;
 import net.calzoneman.TileLand.inventory.Item;
+import net.calzoneman.TileLand.inventory.ItemStack;
 import net.calzoneman.TileLand.level.Layer;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
+import net.calzoneman.TileLand.player.Player;
 
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.Texture;
@@ -101,7 +103,8 @@ public class Tile extends Item implements Renderable {
 	}
 
 	@Override
-	public ActionResult leftClick(Level lvl, int x, int y) {
+	public ActionResult leftClick(Player ply, int x, int y) {
+		Level lvl = ply.getLevel();
 		Tile before;
 		if(isForeground())
 			before = lvl.getFg(x, y);
@@ -118,28 +121,43 @@ public class Tile extends Item implements Renderable {
 		else
 			after = lvl.getBg(x, y);
 		Tile result = null;
-		if(before != after && worked)
+		if(before != after && worked) {
 			result = before;
+			ply.getInventory().removeOneItem(ply.getPlayerInventory().getQuickbar().getSelectedSlot());
+		}
 		return new ActionResult(ActionResult.TILE_PLACE, result);
 	}
 
 	@Override
-	public ActionResult rightClick(Level lvl, int x, int y) {
+	public ActionResult rightClick(Player ply, int x, int y) {
+		Level lvl = ply.getLevel();
 		int fg = lvl.getFgId(x, y);
+		int fgdata = lvl.getFgData(x, y);
 		if(fg == TileId.AIR) {
 			int bg = lvl.getBgId(x, y);
+			int bgdata = lvl.getBgData(x, y);
 			if(!TileTypes.playerBreakable(bg))
 				return new ActionResult(ActionResult.FAILURE, null);
-			else if(lvl.setTile(x, y, TileTypes.getDefaultBg()))
+			else if(lvl.setTile(x, y, TileTypes.getDefaultBg())) {
+				ItemStack it = new ItemStack(TileTypes.getTile(bg), 1);
+				if(TileTypes.getTile(bg).hasData() && !TileTypes.getTile(bg).isMultidirectional())
+					it.setData(bgdata);
+				ply.getInventory().addItemStack(it);
 				return new ActionResult(ActionResult.TILE_BREAK, TileTypes.getTile(bg));
+			}
 			else
 				return new ActionResult(ActionResult.FAILURE, null);
 		}
 		else if(!TileTypes.playerBreakable(fg)) {
 			return new ActionResult(ActionResult.FAILURE, null);
 		}
-		else if (lvl.setTile(x, y, TileTypes.getDefaultFg()))
+		else if (lvl.setTile(x, y, TileTypes.getDefaultFg())) {
+			ItemStack it = new ItemStack(TileTypes.getTile(fg), 1);
+			if(TileTypes.getTile(fg).hasData() && !TileTypes.getTile(fg).isMultidirectional())
+				it.setData(fgdata);
+			ply.getInventory().addItemStack(it);
 			return new ActionResult(ActionResult.TILE_BREAK, TileTypes.getTile(fg));
+		}
 		else
 			return new ActionResult(ActionResult.FAILURE, null);
 	}
