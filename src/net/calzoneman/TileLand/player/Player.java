@@ -2,12 +2,10 @@ package net.calzoneman.TileLand.player;
 
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.Color;
 
-import net.calzoneman.TileLand.action.ActionResult;
 import net.calzoneman.TileLand.gfx.PlayerSprite;
 import net.calzoneman.TileLand.gfx.Renderable;
 import net.calzoneman.TileLand.gfx.Renderer;

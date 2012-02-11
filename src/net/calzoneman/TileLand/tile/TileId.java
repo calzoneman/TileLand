@@ -5,7 +5,7 @@ public class TileId {
 	public static final short NULL = -1;
 	public static final short AIR = 0;
 	
-	// Background tiles
+	// Background tiles [ 0x0001 to 0x0FFF ]
 	public static final short DIRT = 1;
 	public static final short GRASS = 2;
 	public static final short LAKE = 3;
@@ -14,11 +14,11 @@ public class TileId {
 	public static final short SNOWY_GRASS = 6;
 	public static final short LAKE_FROZEN = 7;
 	
-	// Foreground tiles
-	public static final short TREE_1 = 8;
-	public static final short TREE_2 = 9;
-	public static final short BUSH = 10;
-	public static final short SIGN = 11;
-	public static final short ROCK_1 = 12;
-	public static final short MOUNTAIN = 13;
+	// Foreground tiles [ 0x1000 to 0x1FFF ]
+	public static final short TREE_1 = 4096;
+	public static final short TREE_2 = 4097;
+	public static final short BUSH = 4098;
+	public static final short SIGN = 4099;
+	public static final short ROCK_1 = 4100;
+	public static final short MOUNTAIN = 4101;
 }

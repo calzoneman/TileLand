@@ -1,9 +1,6 @@
 package net.calzoneman.TileLand.level;
 
 
-import net.calzoneman.TileLand.tile.Tile;
-import net.calzoneman.TileLand.tile.TileTypes;
-
 public class BackgroundLayer extends Layer {
 
 	/**
