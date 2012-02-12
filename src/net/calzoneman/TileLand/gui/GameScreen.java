@@ -2,7 +2,7 @@ package net.calzoneman.TileLand.gui;
 
 import net.calzoneman.TileLand.Game;
 
-public abstract class GameScreen extends GUIComponent {
+public abstract class GameScreen {
 	/** The Game* that this screen is a child of 
 	 *  * Also you just lost the game ;)
 	 */
@@ -13,15 +13,23 @@ public abstract class GameScreen extends GUIComponent {
 	 */
 	public boolean active = true;
 	
+	protected int x;
+	protected int y;
+	protected int width;
+	protected int height;
+	
 	/**
-	 * Inherited Constructor
+	 * Constructor
 	 * @param x The x-coordinate of the upper left corner of this GameScreen
 	 * @param y The y-coordinate of the upper left corner of this GameScreen
 	 * @param width The width of this GameScreen
 	 * @param height The height of this GameScreen
 	 */
 	public GameScreen(int x, int y, int width, int height) {
-		super(x, y, width, height);
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
 	}
 	
 	/**
@@ -33,9 +41,14 @@ public abstract class GameScreen extends GUIComponent {
 	 * @param parent The Game which parents this GameScreen
 	 */
 	public GameScreen(int x, int y, int width, int height, Game parent) {
-		super(x, y, width, height);
+		this(x, y, width, height);
 		this.parent = parent;
 	}
+	
+	/**
+	 * Renders the screen
+	 */
+	public abstract void render();
 	
 	/**
 	 * Reads user input from the Mouse and/or Keyboard and updates appropriately

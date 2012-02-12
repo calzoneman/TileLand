@@ -84,6 +84,7 @@ public class TilelandFont{
 		}
 		String sub = str.substring(start);
 		drawBasicString(x+dx, y, sub, current, bg);
+		COLOR_WHITE.bind();
 	}
 	
 	private void drawBasicString(int x, int y, String str, Color fg, Color bg) {

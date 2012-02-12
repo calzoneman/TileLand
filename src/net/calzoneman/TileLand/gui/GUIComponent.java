@@ -1,16 +1,12 @@
 package net.calzoneman.TileLand.gui;
 
-import java.util.ArrayList;
-
 
 public abstract class GUIComponent {
 	protected int x;
 	protected int y;
 	protected int width;
 	protected int height;
-	
-	protected ArrayList<GUIComponent> children;
-	
+		
 	public GUIComponent(int x, int y, int width, int height) {
 		this.x = x;
 		this.y = y;
@@ -19,6 +15,16 @@ public abstract class GUIComponent {
 	}
 	
 	public abstract void render();
+	
+	public void onHover() { }
+	
+	public void onUnHover() { }
+	
+	public void onClick() { }
+	
+	public void onClickOut() { }
+	
+	public void onKey(int keyCode, char keychar) { }
 	
 	public void setPosition(int x, int y) {
 		this.x = x;
@@ -37,4 +43,6 @@ public abstract class GUIComponent {
 	public int getWidth() { return width; }
 	
 	public int getHeight() { return height; }
+	
+	public boolean isFocusable() { return false; }
 }

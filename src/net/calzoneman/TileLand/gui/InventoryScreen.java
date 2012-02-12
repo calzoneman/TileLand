@@ -15,6 +15,8 @@ public class InventoryScreen extends GameScreen {
 	private Color slotBgColor = new Color(0.2f, 0.2f, 0.2f, 0.5f);
 	private Color barBgColor = new Color(0.4f, 0.4f, 0.4f, 0.5f);
 	private ItemStack selected = null;
+	private GUIButton saveButton;
+	private GUIButton quitButton;
 	
 	private boolean[] oldmouse;
 	private boolean[] mouse;
@@ -29,6 +31,8 @@ public class InventoryScreen extends GameScreen {
 		this.keys = new boolean[256]; // Keyboard.getKeyCount() seems to have issues...
 		this.mouse = new boolean[Mouse.getButtonCount()];
 		this.oldmouse = new boolean[Mouse.getButtonCount()];
+		this.saveButton = new GUIButton(Display.getWidth()-150, Display.getHeight()-120, 100, "Save");
+		this.quitButton = new GUIButton(Display.getWidth()-150, Display.getHeight()-80, 100, "Quit");
 	}
 	
 	@Override
@@ -41,12 +45,34 @@ public class InventoryScreen extends GameScreen {
 				mouse[Mouse.getEventButton()] = Mouse.getEventButtonState();
 			}
 			
+			// Check if the save button was clicked
+			int mx = Mouse.getX();
+			int my = Display.getHeight() - Mouse.getY();
+			if(mx > saveButton.getX() && mx < saveButton.getX() + saveButton.getWidth()
+					&& my > saveButton.getY() && my < saveButton.getY() + saveButton.getHeight()) {
+				saveButton.onHover();
+				if(mouse[0]) {
+					parent.getPlayer().getLevel().save();
+					saveButton.setText("Level Saved");
+				}
+			}
+			else
+				saveButton.onUnHover();
+			
+			// Check hover and click for Quit button
+			if(mx > quitButton.getX() && mx < quitButton.getX() + quitButton.getWidth()
+					&& my > quitButton.getY() && my < quitButton.getY() + quitButton.getHeight()) {
+				quitButton.onHover();
+				if(mouse[0])
+					MenuManager.getMenuManager().goBack();
+			}
+			else
+				quitButton.onUnHover();
+			
 			// Calculate position relative to the inventory
 			int offX = this.x;
 			int offY = this.y;
-			int mx = Mouse.getX();
 			mx -= offX;
-			int my = (Display.getHeight() - Mouse.getY());
 			if(my < this.y)
 				offY = inv.getQuickbar().getY();
 			my -= offY;
@@ -119,8 +145,6 @@ public class InventoryScreen extends GameScreen {
 	@Override
 	public void render() {
 		PlayerInventory inv = parent.getPlayer().getPlayerInventory();
-		// Draw the quickbar
-		//inv.getQuickbar().render();
 		
 		// Draw the background
 		Renderer.renderFilledRect(this.x, this.y, this.width, this.height, barBgColor);
@@ -158,6 +182,9 @@ public class InventoryScreen extends GameScreen {
 		}
 		if(selected != null)
 			selected.render(Mouse.getX(), Display.getHeight() - Mouse.getY());
+		
+		saveButton.render();
+		quitButton.render();
 	}
 
 }

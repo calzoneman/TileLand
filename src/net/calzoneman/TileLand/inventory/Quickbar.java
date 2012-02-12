@@ -85,4 +85,15 @@ public class Quickbar extends GUIComponent {
 				Renderer.renderRect(x, y, Level.TILESIZE, Level.TILESIZE, Color.green);
 		}
 	}
+
+	@Override
+	public void onHover() {	}
+
+	@Override
+	public void onClick() {	}
+
+	@Override
+	public boolean isFocusable() {
+		return false;
+	}
 }

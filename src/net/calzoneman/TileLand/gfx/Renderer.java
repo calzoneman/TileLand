@@ -241,6 +241,35 @@ public class Renderer {
 		glDisable(GL_BLEND);
 	}
 	
+	/**
+	 * Renders a subrectangle of a Texture
+	 * @param tex The texture to bind
+	 * @param rect The Rectangle to draw
+	 * @param x The x coordinate at which to draw the rectangle
+	 * @param y The y coordinate at which to draw the rectangle
+	 */
+	public static void renderTextureSubrectangle(Texture tex, Rectangle rect, int x, int y, int w, int h) {
+		int texWidth = tex.getTextureWidth();
+		int texHeight = tex.getTextureHeight();
+		float rectX = rect.getX();
+		float rectY = rect.getY();
+		float rectWidth = rect.getWidth();
+		float rectHeight = rect.getHeight();
+		tex.bind();
+		glEnable(GL_BLEND);
+		glBegin(GL_QUADS);
+			glTexCoord2f(rectX / texWidth, rectY / texHeight);
+			glVertex2f(x, y);
+			glTexCoord2f((rectX + rectWidth) / texWidth, rectY / texHeight);
+			glVertex2f(x + w, y);
+			glTexCoord2f((rectX + rectWidth) / texWidth, (rectY + rectHeight) / texHeight);
+			glVertex2f(x + w, y + h);
+			glTexCoord2f(rectX / texWidth, (rectY + rectHeight) / texHeight);
+			glVertex2f(x, y + h);
+		glEnd();
+		glDisable(GL_BLEND);
+	}
+	
 	public static void renderFilledRect(int x, int y, int w, int h, Color col) {
 		glDisable(GL_TEXTURE_2D);
 	    if(col.getAlpha() != 255)
