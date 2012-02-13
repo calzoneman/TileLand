@@ -60,6 +60,15 @@ public class GUIContainer extends GUIComponent {
 		this.lastKeyTime = Long.MAX_VALUE - KEY_WAIT;
 	}
 	
+	public void init(int x, int y, int width, int height) { 
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
+	
+	public void reInit(int x, int y, int width, int height) { }
+	
 	public GUIContainer getParent() {
 		return parent;
 	}

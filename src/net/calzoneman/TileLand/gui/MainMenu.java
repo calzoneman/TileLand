@@ -16,6 +16,11 @@ public class MainMenu extends GUIMenu {
 
 	public MainMenu() {
 		super();
+		init(0, 0, Display.getWidth(), Display.getHeight());
+	}
+	
+	@Override
+	public void init(int x, int y, int width, int height) {
 		GUIContainer container = new GUIContainer(Display.getWidth()/2 - 320, Display.getHeight()/2 - 240, 640, 480);
 		container.addChild("title", new GUIImage(container.getWidth()/2 - 256, 50, TileLand.getResourceManager().getTexture("res/title.png")));
 		
@@ -41,6 +46,12 @@ public class MainMenu extends GUIMenu {
 		container.addChild("loadgame", loadLvlBtn);
 		container.setParent(this);
 		addChild("container", container);
+	}
+	
+	@Override
+	public void reInit(int x, int y, int width, int height) {
+		children.clear();
+		init(x, y, width, height);
 	}
 	
 	@Override

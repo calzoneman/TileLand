@@ -13,6 +13,10 @@ public class MenuManager {
 		return menuManager;
 	}
 	
+	public GUIMenu getCurrent() {
+		return currentMenu;
+	}
+	
 	private void pushParent(GUIMenu parent) {
 		parent.resetAll();
 		parentMenus.push(parent);

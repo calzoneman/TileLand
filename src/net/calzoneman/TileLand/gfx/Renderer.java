@@ -74,6 +74,24 @@ public class Renderer {
 		return true;
 	}
 	
+	public static boolean reInit(int width, int height) {
+		try {
+			Display.setDisplayMode(new DisplayMode(width, height));
+		}
+		catch(Exception ex) {
+			System.out.println("Error initializing GL: ");
+			ex.printStackTrace();
+			return false;
+		}
+		
+		glViewport(0, 0, width, height);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, width, height, 0, 1, -1);
+		glMatrixMode(GL_MODELVIEW);
+		return true;
+	}
+	
 	public static TilelandFont getFont() {
 		return font;
 	}
@@ -135,6 +153,18 @@ public class Renderer {
 		font.drawString(0, 0, "FPS: " + fps);
 		glDisable(GL_BLEND);
 		currentFrames++;
+	}
+	
+	public static void renderFPS() {
+		glEnable(GL_BLEND);
+		font.drawString(0, 0, "FPS: " + fps);
+		glDisable(GL_BLEND);
+		currentFrames++;
+		if(System.nanoTime() >= lastFPSMeasureTime + 1000000000) {
+			fps = (int) currentFrames;
+			currentFrames = 0;
+			lastFPSMeasureTime = System.nanoTime();
+		}
 	}
 	
 	/**

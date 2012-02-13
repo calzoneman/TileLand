@@ -41,6 +41,16 @@ public class GUITextbox extends GUIComponent {
 		return this.text;
 	}
 	
+	public String getTextOrDefault() {
+		if(text.isEmpty())
+			return defaultText;
+		return text;
+	}
+	
+	public String getDefaultText() {
+		return defaultText;
+	}
+	
 	public void setText(String txt) {
 		this.text = txt;
 	}
