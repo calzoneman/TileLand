@@ -63,6 +63,13 @@ public class NewLevelMenu extends GUIMenu {
 		
 		GUILabel error = new GUILabel(x1, curY, "");
 		addChild("error", error);
+		
+		fieldOrder = new String[] { "plynametxt", "lvlwidthtxt", "lvlheighttxt", "lvlnametxt" };
+	}
+	
+	@Override
+	protected void onEnter() {
+		createLevel();
 	}
 	
 	public void createLevel() {

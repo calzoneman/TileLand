@@ -1,4 +1,4 @@
-package net.calzoneman.TileLand.gui;
+package net.calzoneman.TileLand.screen;
 
 import net.calzoneman.TileLand.Game;
 import net.calzoneman.TileLand.action.ActionResult;

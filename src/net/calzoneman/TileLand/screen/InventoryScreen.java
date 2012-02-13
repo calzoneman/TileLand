@@ -1,4 +1,4 @@
-package net.calzoneman.TileLand.gui;
+package net.calzoneman.TileLand.screen;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -6,6 +6,8 @@ import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 
 import net.calzoneman.TileLand.gfx.Renderer;
+import net.calzoneman.TileLand.gui.GUIButton;
+import net.calzoneman.TileLand.gui.MenuManager;
 import net.calzoneman.TileLand.inventory.ItemStack;
 import net.calzoneman.TileLand.inventory.PlayerInventory;
 import net.calzoneman.TileLand.level.Level;

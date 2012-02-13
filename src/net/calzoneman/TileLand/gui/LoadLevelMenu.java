@@ -53,6 +53,13 @@ public class LoadLevelMenu extends GUIMenu {
 		
 		GUILabel error = new GUILabel(x1, curY, "");
 		addChild("error", error);
+		
+		fieldOrder = new String[] { "plynametxt", "lvlnametxt" };
+	}
+	
+	@Override
+	protected void onEnter() {
+		loadLevel();
 	}
 	
 	public String getPlayerName() {

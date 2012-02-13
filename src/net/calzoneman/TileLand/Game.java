@@ -1,9 +1,9 @@
 package net.calzoneman.TileLand;
 
 
-import net.calzoneman.TileLand.gui.GameScreen;
-import net.calzoneman.TileLand.gui.MainScreen;
 import net.calzoneman.TileLand.player.Player;
+import net.calzoneman.TileLand.screen.GameScreen;
+import net.calzoneman.TileLand.screen.MainScreen;
 
 public class Game {
 	private Player player;

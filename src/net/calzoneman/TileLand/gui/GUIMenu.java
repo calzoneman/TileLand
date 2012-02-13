@@ -7,8 +7,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 public class GUIMenu {
-	protected boolean done;
 	protected HashMap<String, GUIComponent> children;
+	protected String[] fieldOrder;
 	protected GUIComponent focused;
 	protected boolean[] mouse;
 	protected boolean[] keys;
@@ -18,19 +18,25 @@ public class GUIMenu {
 		this.keys = new boolean[256];
 		this.children = new HashMap<String, GUIComponent>();
 		this.focused = null;
-		this.done = false;
+		this.fieldOrder = new String[] { };
 	}
 	
+	/**
+	 * Adds a child component to this Menu
+	 * @param name The reference name of the child (e.g. "cancelbutton")
+	 * @param child The child component to add
+	 */
 	public void addChild(String name, GUIComponent child) {
 		children.put(name, child);
 	}
 	
+	/**
+	 * Retrieve a child component by reference name
+	 * @param name The name of the child to retrieve
+	 * @return The GUIComponent associated with name if it exists, null otherwise
+	 */
 	public GUIComponent getChild(String name) {
 		return children.get(name);
-	}
-	
-	public boolean isDone() {
-		return done;
 	}
 	
 	public void render() {
@@ -62,10 +68,39 @@ public class GUIMenu {
 	}
 	
 	private void keypress(int keycode, char keychar) {
-		if(focused != null) {
+		if(keycode == Keyboard.KEY_TAB)
+			onTab();
+		else if(keycode == Keyboard.KEY_RETURN)
+			onEnter();
+		else if(focused != null) {
 			focused.onKey(keycode, keychar);
 		}
 	}
+	
+	protected void onTab() {
+		if(focused != null) {
+			String focusedKey = "";
+			for(String key : children.keySet()) {
+				if(children.get(key).equals(focused))
+					focusedKey = key;
+			}
+			int i = 0;
+			while(i < fieldOrder.length && !fieldOrder[i].equals(focusedKey))
+				i++;
+			if(keys[Keyboard.KEY_LSHIFT] && i < fieldOrder.length && i > 0) {
+				focused.onClickOut();
+				focused = children.get(fieldOrder[--i]);
+				focused.onClick();
+			}
+			else if(i < fieldOrder.length-1) {
+				focused.onClickOut();
+				focused = children.get(fieldOrder[++i]);
+				focused.onClick();
+			}
+		}
+	}
+	
+	protected void onEnter() { }
 
 	private void checkHover(int mx, int my) {
 		for(GUIComponent comp : children.values()) {

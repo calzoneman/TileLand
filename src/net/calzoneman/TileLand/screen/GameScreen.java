@@ -1,4 +1,4 @@
-package net.calzoneman.TileLand.gui;
+package net.calzoneman.TileLand.screen;
 
 import net.calzoneman.TileLand.Game;
 
@@ -64,7 +64,7 @@ public abstract class GameScreen {
 	
 	/**
 	 * Getter for parent
-	 * @see net.calzoneman.TileLand.gui.GameScreen#parent
+	 * @see net.calzoneman.TileLand.screen.GameScreen#parent
 	 * @return The parent Game for this GameScreen
 	 */
 	public Game getParent() {
@@ -73,7 +73,7 @@ public abstract class GameScreen {
 	
 	/**
 	 * Setter for parent
-	 * @see net.calzoneman.TileLand.gui.GameScreen#parent
+	 * @see net.calzoneman.TileLand.screen.GameScreen#parent
 	 */
 	public void setParent(Game parent) {
 		this.parent = parent;
