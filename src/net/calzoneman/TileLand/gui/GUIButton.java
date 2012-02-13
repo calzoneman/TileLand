@@ -6,6 +6,7 @@ import org.newdawn.slick.opengl.Texture;
 
 import net.calzoneman.TileLand.TileLand;
 import net.calzoneman.TileLand.gfx.Renderer;
+import net.calzoneman.TileLand.gfx.TilelandFont;
 import net.calzoneman.TileLand.util.Delegate;
 
 public class GUIButton extends GUIComponent {
@@ -26,7 +27,6 @@ public class GUIButton extends GUIComponent {
 	protected String text;
 	protected Delegate<GUIMenu, Void> clickHandler;
 	protected Texture texture;
-	protected boolean highlighted = false;
 
 	public GUIButton(int x, int y, String text) {
 		this(x, y, Renderer.getFont().getWidth(text) + 20, text);
@@ -70,7 +70,7 @@ public class GUIButton extends GUIComponent {
 
 	@Override
 	public void render() {
-		if(highlighted) {
+		if(isHovered()) {
 			// Draw left edge
 			Renderer.renderTextureSubrectangle(texture, LEFT_EDGE_HOVER, x, y);
 			// Render center
@@ -90,19 +90,10 @@ public class GUIButton extends GUIComponent {
 		int h = Renderer.getFont().getHeight(text);
 		int sx = this.x + this.width/2 - w/2;
 		int sy = this.y + this.height/2 - h/2;
-		Renderer.getFont().drawString(sx, sy, text, transparent);
-	}
-
-	@Override
-	public void onHover() {
-		// TODO Auto-generated method stub
-		// TODO Make the button highlighted
-		highlighted = true;
-	}
-	
-	@Override
-	public void onUnHover() {
-		highlighted = false;
+		if(isFocused())
+			Renderer.getFont().drawString(sx, sy, TilelandFont.TEXT_YELLOW + text, transparent);
+		else
+			Renderer.getFont().drawString(sx, sy, text, transparent);
 	}
 
 	@Override

@@ -8,7 +8,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 public class TileLand {	
-	public static final String version = "0.20a_01";
+	public static final String version = "0.20a_02";
 	static ResourceManager rm;
 	public static void main(String[] args) {
 		if(!Renderer.init())

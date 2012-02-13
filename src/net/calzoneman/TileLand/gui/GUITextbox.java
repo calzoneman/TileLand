@@ -24,8 +24,6 @@ public class GUITextbox extends GUIComponent {
 	protected String text;
 	protected String defaultText;
 	protected int maxLength;
-	protected long cursorTime;
-	protected boolean focused;
 
 	public GUITextbox(int x, int y, int maxlen) {
 		this(x, y, maxlen, "");
@@ -37,7 +35,6 @@ public class GUITextbox extends GUIComponent {
 		this.defaultText = defaultText;
 		this.maxLength = maxlen;
 		this.texture = TileLand.getResourceManager().getTexture("res/gui/textbox.png");
-		this.focused = false;
 	}
 	
 	public String getText() {
@@ -57,21 +54,19 @@ public class GUITextbox extends GUIComponent {
 		int sy = y + height/2 - h/2;
 		Renderer.getFont().drawString(x + PADDING_LEFT + EDGE_WIDTH, sy, text, transparent);
 		
-		if(focused && (System.currentTimeMillis() / 500) % 2 == 0)
+		if(isFocused() && (System.currentTimeMillis() / 500) % 2 == 0)
 			Renderer.getFont().drawString(x + PADDING_LEFT + EDGE_WIDTH + Renderer.getFont().getWidth(text), sy, "_", transparent);
 	}
 	
 	@Override
-	public void onClick() {
-		this.focused = true;
+	public void onFocus() {
 		if(text.equals(defaultText))
 			text = "";
 	}
 	
 	@Override
-	public void onClickOut() {
-		this.focused = false;
-		if(text.equals(""))
+	public void onBlur() {
+		if(text.isEmpty())
 			text = defaultText;
 	}
 	
@@ -84,10 +79,5 @@ public class GUITextbox extends GUIComponent {
 		else if(keychar != Keyboard.CHAR_NONE && text.length() < maxLength-1) {
 			text += keychar;
 		}
-	}
-	
-	@Override
-	public boolean isFocusable() {
-		return true;
 	}
 }

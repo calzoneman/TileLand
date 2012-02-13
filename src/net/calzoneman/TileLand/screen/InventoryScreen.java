@@ -52,24 +52,36 @@ public class InventoryScreen extends GameScreen {
 			int my = Display.getHeight() - Mouse.getY();
 			if(mx > saveButton.getX() && mx < saveButton.getX() + saveButton.getWidth()
 					&& my > saveButton.getY() && my < saveButton.getY() + saveButton.getHeight()) {
-				saveButton.onHover();
-				if(mouse[0]) {
+				saveButton.hover();
+				if(mouse[0] && !oldmouse[0])
+					saveButton.focus();
+				else if(oldmouse[0] && !mouse[0]) {
 					parent.getPlayer().getLevel().save();
 					saveButton.setText("Level Saved");
 				}
 			}
-			else
-				saveButton.onUnHover();
+			else {
+				if(saveButton.isFocused())
+					saveButton.blur();
+				if(saveButton.isHovered())
+					saveButton.unhover();
+			}
 			
 			// Check hover and click for Quit button
 			if(mx > quitButton.getX() && mx < quitButton.getX() + quitButton.getWidth()
 					&& my > quitButton.getY() && my < quitButton.getY() + quitButton.getHeight()) {
-				quitButton.onHover();
-				if(mouse[0])
+				quitButton.hover();
+				if(mouse[0] && !oldmouse[0])
+					quitButton.focus();
+				else if(oldmouse[0] && !mouse[0])
 					MenuManager.getMenuManager().goBack();
 			}
-			else
-				quitButton.onUnHover();
+			else {
+				if(quitButton.isFocused())
+					quitButton.blur();
+				if(quitButton.isHovered())
+					quitButton.unhover();
+			}
 			
 			// Calculate position relative to the inventory
 			int offX = this.x;

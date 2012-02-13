@@ -73,13 +73,8 @@ public class LoadLevelMenu extends GUIMenu {
 	protected void loadLevel() {
 		String plyName = "Player";
 		String lvlName = "";
-		try {
-			plyName = ((GUITextbox) getChild("plynametxt")).getText();
-			lvlName = ((GUITextbox) getChild("lvlnametxt")).getText();
-		}
-		catch(Exception ex) {
-			((GUILabel) getChild("error")).setText(TilelandFont.TEXT_RED + "One or more inputs is invalid");
-		}
+		plyName = ((GUITextbox) getChild("plynametxt")).getText();
+		lvlName = ((GUITextbox) getChild("lvlnametxt")).getText();
 		
 		if(!lvlName.endsWith(".tl"))
 			lvlName += ".tl";

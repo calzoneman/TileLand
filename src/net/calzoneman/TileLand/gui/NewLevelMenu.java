@@ -61,8 +61,17 @@ public class NewLevelMenu extends GUIMenu {
 		addChild("createbtn", createBtn);
 		curY += createBtn.getHeight() + 10;
 		
-		GUILabel error = new GUILabel(x1, curY, "");
-		addChild("error", error);
+		GUILabel widtherror = new GUILabel(x1, curY, "");
+		addChild("widtherror", widtherror);
+		curY += widtherror.getHeight() + 10;
+		
+		GUILabel heighterror = new GUILabel(x1, curY, "");
+		addChild("heighterror", heighterror);
+		curY += heighterror.getHeight() + 10;
+		
+		GUILabel levelnameerror = new GUILabel(x1, curY, "");
+		addChild("levelnameerror", levelnameerror);
+		curY += levelnameerror.getHeight() + 10;
 		
 		fieldOrder = new String[] { "plynametxt", "lvlwidthtxt", "lvlheighttxt", "lvlnametxt" };
 	}
@@ -75,9 +84,6 @@ public class NewLevelMenu extends GUIMenu {
 	public void createLevel() {
 		if(validate())
 			MenuManager.getMenuManager().openMenu("singleplayergame");
-		else {
-			((GUILabel) getChild("error")).setText(TilelandFont.TEXT_DARK_RED + "There is an error with one or more entries");
-		}
 	}
 	
 	public boolean validate() {
@@ -85,19 +91,37 @@ public class NewLevelMenu extends GUIMenu {
 		int h = -1;
 		String lvlName = "";
 		String plyName = "";
+		boolean error = false;
 		try {
 			w = Integer.parseInt(((GUITextbox) getChild("lvlwidthtxt")).getText());
-			h = Integer.parseInt(((GUITextbox) getChild("lvlheighttxt")).getText());
-			lvlName = ((GUITextbox) getChild("lvlnametxt")).getText();
-			plyName = ((GUITextbox) getChild("plynametxt")).getText();
 		}
 		catch(Exception ex) {
-			return false;
+			((GUILabel) getChild("widtherror")).setText(TilelandFont.TEXT_DARK_RED + "Invalid level width");
+			error = true;
 		}
-		if(w < 0 || h < 0)
-			return false;
+		try {
+			h = Integer.parseInt(((GUITextbox) getChild("lvlheighttxt")).getText());
+		}
+		catch(Exception ex) {
+			((GUILabel) getChild("heighterror")).setText(TilelandFont.TEXT_DARK_RED + "Invalid level height");
+			error = true;
+		}
+		lvlName = ((GUITextbox) getChild("lvlnametxt")).getText();
+		if(lvlName.isEmpty()) {
+			((GUILabel) getChild("levelnameerror")).setText(TilelandFont.TEXT_DARK_RED + "Invalid level name");
+			error = true;
+		}
+		plyName = ((GUITextbox) getChild("plynametxt")).getText();
+		if(w < 0) {
+			((GUILabel) getChild("widtherror")).setText(TilelandFont.TEXT_DARK_RED + "Invalid level width");
+			error = true;
+		}
+		if(h < 0) {
+			((GUILabel) getChild("heighterror")).setText(TilelandFont.TEXT_DARK_RED + "Invalid level height");
+			error = true;
+		}
 		gameParameters = new GameParameters(w, h, lvlName, plyName);
-		return true;
+		return !error;
 	}
 	
 	public GameParameters getGameParameters() {

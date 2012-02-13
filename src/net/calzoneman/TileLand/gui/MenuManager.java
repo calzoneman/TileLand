@@ -13,6 +13,11 @@ public class MenuManager {
 		return menuManager;
 	}
 	
+	private void pushParent(GUIMenu parent) {
+		parent.resetAll();
+		parentMenus.push(parent);
+	}
+	
 	public void openMenu(String menuName) {
 		GUIMenu old = currentMenu;
 		if(menuName.equals("mainmenu"))
@@ -34,7 +39,7 @@ public class MenuManager {
 			parentMenus = new Stack<GUIMenu>(); // Reset the menu Stack
 		}
 		if(old != null)
-			parentMenus.push(old);
+			pushParent(old);
 	}
 	
 	public void goBack() {
