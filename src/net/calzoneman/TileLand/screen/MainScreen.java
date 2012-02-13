@@ -24,6 +24,9 @@ public class MainScreen extends GameScreen {
 	private boolean[] keys;
 	private int currentMoveKey;
 	private long lastMoveTime;
+	private long lastClickTime;
+	
+	static final long CLICK_DELAY = 50000000L;
 	
 	/** Colors for Mouse overlay */
 	private static Color transparentRed = new Color(255, 0, 0, 130);
@@ -35,6 +38,7 @@ public class MainScreen extends GameScreen {
 		this.mouse = new boolean[Mouse.getButtonCount()];
 		this.currentMoveKey = -1;
 		this.lastMoveTime = 0;
+		this.lastClickTime = 0;
 	}
 	
 	@Override
@@ -133,19 +137,24 @@ public class MainScreen extends GameScreen {
 			Item held = null;
 			if (inventory.getQuickbar().getSelectedItemStack() != null)
 				held = inventory.getQuickbar().getSelectedItemStack().getItem();
-			ActionResult ar = null;
 			// You can't place null!  (You can break with it though)
 			if(held == null && mouse[0])
 				return;
 			// Why would you even do this [placing a tile on top of you]
 			if(held instanceof Tile && ((Tile) held).isSolid() && tx == position.x && ty == position.y)
 				return;
+			// Limit time spacing
+			if(System.nanoTime() < lastClickTime + CLICK_DELAY)
+				return;
+			ActionResult ar = null;
 			if(mouse[0])
 				ar = held.leftClick(ply, tx, ty);
 			else if (mouse[1] && held == null)
 				ar = defaultRightClick(ply, tx, ty);
 			else if (mouse[1])
 				ar = held.rightClick(ply, tx, ty);
+			if(ar != null && ar.getResultCode() != ActionResult.FAILURE)
+				lastClickTime = System.nanoTime();
 		}
 	}
 	

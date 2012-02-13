@@ -3,6 +3,8 @@ package net.calzoneman.TileLand;
 import java.io.File;
 import java.util.HashMap;
 
+import net.calzoneman.TileLand.gfx.TilelandFont;
+
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
@@ -12,7 +14,10 @@ import org.newdawn.slick.util.ResourceLoader;
 
 public class ResourceManager {
 	private HashMap<String, Texture> textures;
-	private HashMap<String, UnicodeFont> fonts;
+	private HashMap<String, TilelandFont> fonts;
+	private TilelandFont preferredFont = null;
+	private Texture preferredTiles = null;
+	private Texture preferredPlayer = null;
 	final String[] textureFormats = { "PNG", "TGA" };
 	final String[] fontFormats = { "TTF" };
 	
@@ -22,7 +27,7 @@ public class ResourceManager {
 	
 	public ResourceManager(String sourcefolder) {
 		textures = new HashMap<String, Texture>();
-		fonts = new HashMap<String, UnicodeFont>();
+		fonts = new HashMap<String, TilelandFont>();
 		processFolder(sourcefolder, true);
 		dump();
 	}
@@ -66,7 +71,7 @@ public class ResourceManager {
 			fnt.addAsciiGlyphs();
 			fnt.getEffects().add(new ColorEffect()); // For some reason you have to add an effect...
 			fnt.loadGlyphs();
-			fonts.put(f.getPath().replace('\\', '/'), fnt);
+			fonts.put(f.getPath().replace('\\', '/'), new TilelandFont(fnt));
 			System.out.println("INFO: Loaded font from " + f.getName());
 			return true;
 		} 
@@ -76,16 +81,66 @@ public class ResourceManager {
 		}
 	}
 	
-	public Texture getTexture(String name) {
-		return textures.get(name);
+	public Texture getPreferredTiles() {
+		if(preferredTiles == null)
+			return getTexture("res/tiles/default.png");
+		return preferredTiles;
 	}
 	
-	public UnicodeFont getFont(String name) {
+	public void setPreferredTiles(String preferredTiles) {
+		this.preferredTiles = getTexture(preferredTiles);
+	}
+	
+	public Texture getPreferredPlayer() {
+		if(preferredPlayer == null)
+			return getTexture("res/player/default.png");
+		return preferredPlayer;
+	}
+	
+	public void setPreferredPlayer(String preferredPlayer) {
+		this.preferredPlayer = getTexture(preferredPlayer);
+	}
+	
+	public TilelandFont getPreferredFont() {
+		if(preferredFont == null)
+			return getDefaultFont();
+		return preferredFont;
+	}
+	
+	public void setPreferredFont(String preferredFont) {
+		this.preferredFont = getFont(preferredFont);
+	}
+
+	public TilelandFont getDefaultFont() {
+		return fonts.get("res/font/default.ttf");
+	}
+	
+	public TilelandFont getFont(String name) {
 		return fonts.get(name);
 	}
 	
-	public UnicodeFont getDefaultFont() {
-		return fonts.get("res/font/default.ttf");
+	@SuppressWarnings("unchecked")
+	public TilelandFont getFont(String name, int pt) {
+		if(fonts.containsKey(name + "@" + pt))
+			return fonts.get(name + "@" + pt);
+		else {
+			try {
+				UnicodeFont fnt = new UnicodeFont(name, pt, false, false);
+				fnt.addAsciiGlyphs();
+				fnt.getEffects().add(new ColorEffect()); // For some reason you have to add an effect...
+				fnt.loadGlyphs();
+				TilelandFont tf = new TilelandFont(fnt);
+				fonts.put(name + "@" + pt, tf);
+				return tf;
+			} 
+			catch (SlickException e) {
+				return getDefaultFont();
+			}
+		}
+	}
+	
+	public Texture getTexture(String name) {
+		return textures.get(name);
 	}
 	
 	public boolean isTexture(String fmt) {

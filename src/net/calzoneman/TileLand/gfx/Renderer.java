@@ -14,7 +14,6 @@ import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.GL11.*;
 
 import org.newdawn.slick.Color;
-import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.opengl.Texture;
 
@@ -32,8 +31,8 @@ public class Renderer {
 	/**
 	 * Initializes the Renderer, loads appropriate resources, initializes GL
 	 */
-	public static boolean init() {
-		if(!initGL(640, 480))
+	public static boolean init(int width, int height) {
+		if(!initGL(width, height))
 			return false;
 		currentFrames = 0;
 		fps = 0;
@@ -79,8 +78,8 @@ public class Renderer {
 		return font;
 	}
 	
-	public static void setFont(UnicodeFont fnt) {
-		font = new TilelandFont(fnt);
+	public static void setFont(TilelandFont fnt) {
+		font = fnt;
 	}
 	
 	/**
@@ -200,14 +199,14 @@ public class Renderer {
 		tex.bind();
 		glEnable(GL_BLEND);
 		glBegin(GL_QUADS);
-			glTexCoord2f(0, 0);
-			glVertex2f(x, y);
-			glTexCoord2f(1, 0);
-			glVertex2f(x+tex.getTextureWidth(), y);
-			glTexCoord2f(1, 1);
-			glVertex2f(x+tex.getTextureWidth(), y+tex.getTextureHeight());
-			glTexCoord2f(0, 1);
-			glVertex2f(x, y+tex.getTextureHeight());
+			glTexCoord2d(0.0D, 0.0D);
+			glVertex2i(x, y);
+			glTexCoord2d(1.0D, 0.0D);
+			glVertex2i(x+tex.getTextureWidth(), y);
+			glTexCoord2d(1.0D, 1.0D);
+			glVertex2i(x+tex.getTextureWidth(), y+tex.getTextureHeight());
+			glTexCoord2d(0.0D, 1.0D);
+			glVertex2i(x, y+tex.getTextureHeight());
 		glEnd();
 		glDisable(GL_BLEND);
 	}

@@ -8,10 +8,10 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 public class TileLand {	
-	public static final String version = "0.20a_02";
+	public static final String version = "0.20a_03";
 	static ResourceManager rm;
 	public static void main(String[] args) {
-		if(!Renderer.init())
+		if(!Renderer.init(640, 480))
 			return;
 		rm = new ResourceManager();
 		Renderer.setFont(rm.getDefaultFont());
@@ -30,7 +30,7 @@ public class TileLand {
 			}
 		}
 	}
-	
+
 	public static ResourceManager getResourceManager() {
 		return rm;
 	}

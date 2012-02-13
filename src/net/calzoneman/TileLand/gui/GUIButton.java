@@ -23,9 +23,9 @@ public class GUIButton extends GUIComponent {
 	
 	static final Color transparent = new Color(0, 0, 0, 0);
 	
-	protected GUIMenu parent;
+	protected GUIContainer parent;
 	protected String text;
-	protected Delegate<GUIMenu, Void> clickHandler;
+	protected Delegate<GUIContainer, Void> clickHandler;
 	protected Texture texture;
 
 	public GUIButton(int x, int y, String text) {
@@ -48,15 +48,15 @@ public class GUIButton extends GUIComponent {
 		
 	}
 	
-	public void setParent(GUIMenu parent) {
+	public void setParent(GUIContainer parent) {
 		this.parent = parent;
 	}
 	
-	public GUIMenu getParent() {
+	public GUIContainer getParent() {
 		return this.parent;
 	}
 	
-	public void setClickHandler(Delegate<GUIMenu, Void> clickHandler) {
+	public void setClickHandler(Delegate<GUIContainer, Void> clickHandler) {
 		this.clickHandler = clickHandler;
 	}
 	
@@ -98,7 +98,9 @@ public class GUIButton extends GUIComponent {
 
 	@Override
 	public void onClick() {
-		clickHandler.run(parent);		
+		if(clickHandler != null)
+			clickHandler.run(parent);
+		blur();
 	}
 
 }
