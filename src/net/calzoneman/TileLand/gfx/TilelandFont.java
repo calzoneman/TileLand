@@ -87,6 +87,22 @@ public class TilelandFont{
 		COLOR_WHITE.bind();
 	}
 	
+	// Strips color codes
+	public static String stripColor(String str) {
+		String out = "";
+		char[] temp = str.toCharArray();
+		for(int i = 0; i < temp.length; i++) {
+			if(temp[i] == COLOR_CODE_DELIMITER) {
+				temp[i] = 0;
+				if(i+1 < temp.length)
+					temp[i+1] = 0;
+			}
+			if(temp[i] != 0)
+				out += temp[i];
+		}
+		return out;
+	}
+	
 	private void drawBasicString(int x, int y, String str, Color fg, Color bg) {
 		Renderer.renderFilledRect(x, y, font.getWidth(str), font.getHeight(str), bg);
 		glEnable(GL_BLEND);

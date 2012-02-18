@@ -20,8 +20,6 @@ import org.newdawn.slick.Color;
 
 public class MainScreen extends GameScreen {
 	
-	private boolean[] mouse;
-	private boolean[] keys;
 	private int currentMoveKey;
 	private long lastMoveTime;
 	private long lastClickTime;
@@ -34,8 +32,6 @@ public class MainScreen extends GameScreen {
 	
 	public MainScreen(Game parent) {
 		super(0, 0, Display.getWidth(), Display.getHeight(), parent);
-		this.keys = new boolean[256]; // Keyboard.getKeyCount() seems to have issues...
-		this.mouse = new boolean[Mouse.getButtonCount()];
 		this.currentMoveKey = -1;
 		this.lastMoveTime = 0;
 		this.lastClickTime = 0;
@@ -105,6 +101,8 @@ public class MainScreen extends GameScreen {
 				ply.setPosition(ply.getLevel().getSpawnpoint());
 			if(keys[Keyboard.KEY_ESCAPE]) 
 				parent.openScreen(new InventoryScreen());
+			if(keys[Keyboard.KEY_T])
+				parent.openChat();
 			// Saving
 			if(keys[Keyboard.KEY_LCONTROL] && keys[Keyboard.KEY_S]) {
 				ply.getLevel().save();

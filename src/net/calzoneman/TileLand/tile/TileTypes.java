@@ -21,7 +21,7 @@ public class TileTypes {
 		// Initialize Tile name Dictionaries
 		tileNames = new HashMap<String, Integer>();
 		
-		Texture tex = TileLand.getResourceManager().getTexture("res/tiles/default.png");
+		Texture tex = TileLand.getResourceManager().getPreferredTiles();
 		
 		// Initialize Tile types
 		addTile(new SolidTile(NULL, "null", tex, new Rectangle(0, 0, 32, 32)));

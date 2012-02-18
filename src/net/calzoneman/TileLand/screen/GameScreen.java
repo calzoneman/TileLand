@@ -1,5 +1,7 @@
 package net.calzoneman.TileLand.screen;
 
+import org.lwjgl.input.Mouse;
+
 import net.calzoneman.TileLand.Game;
 
 public abstract class GameScreen {
@@ -11,12 +13,15 @@ public abstract class GameScreen {
 	 * When set to true, the parent should pass input handling and call handleInput()
 	 * When set to false, the parent should terminate the screen and resume control
 	 */
-	public boolean active = true;
+	protected boolean active = true;
 	
 	protected int x;
 	protected int y;
 	protected int width;
 	protected int height;
+	
+	protected boolean[] mouse;
+	protected boolean[] keys;
 	
 	/**
 	 * Constructor
@@ -30,6 +35,8 @@ public abstract class GameScreen {
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		this.mouse = new boolean[Mouse.getButtonCount()];
+		this.keys = new boolean[256];
 	}
 	
 	/**
@@ -43,6 +50,19 @@ public abstract class GameScreen {
 	public GameScreen(int x, int y, int width, int height, Game parent) {
 		this(x, y, width, height);
 		this.parent = parent;
+	}
+	
+	public boolean isActive() {
+		return active;
+	}
+	
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+	
+	public void resetInput() {
+		mouse = new boolean[mouse.length];
+		keys = new boolean[keys.length];
 	}
 	
 	/**

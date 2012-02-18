@@ -11,7 +11,6 @@ import java.awt.event.WindowEvent;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.calzoneman.TileLand.gfx.Renderer;
-import net.calzoneman.TileLand.gui.GUIMenu;
 import net.calzoneman.TileLand.gui.MenuManager;
 import net.calzoneman.TileLand.tile.TileTypes;
 
@@ -21,7 +20,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 public class TileLand {	
-	public static final String version = "0.21a";
+	public static final String version = "0.21a_01";
 	static AtomicReference<Dimension> newSize = new AtomicReference<Dimension>();
 	static boolean closeRequested = false;
 	static final Dimension DEFAULT_DIMENSION = new Dimension(640, 480);
@@ -105,9 +104,7 @@ public class TileLand {
 				canvas.setPreferredSize(newDim);
 				frame.pack();
 				Renderer.reInit(newDim.width, newDim.height);
-				GUIMenu menu = mm.getCurrent();
-				if(menu != null)
-					menu.reInit(0, 0, newDim.width, newDim.height);
+				mm.reInitAll();
 			}
 			
 			if(Display.isCloseRequested() || closeRequested) {

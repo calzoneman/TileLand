@@ -44,6 +44,20 @@ public class MainMenu extends GUIMenu {
 					}
 				});
 		container.addChild("loadgame", loadLvlBtn);
+		GUIButton multiplayerBtn = new GUIButton(170, 280, 300, "Multiplayer");
+		multiplayerBtn.setEnabled(false);
+		container.addChild("multiplayer", multiplayerBtn);
+		GUIButton setTextureBtn = new GUIButton(170, 320, 300, "Select Texture");
+		setTextureBtn.setClickHandler(
+				new Delegate<GUIContainer, Void>() {
+					@Override
+					public Void run(GUIContainer param) {
+						MenuManager.getMenuManager().openMenu("settexturemenu");
+						return null;
+					}
+				});
+		container.addChild("settexturebtn", setTextureBtn);
+		
 		container.setParent(this);
 		addChild("container", container);
 	}

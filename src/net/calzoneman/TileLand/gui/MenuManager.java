@@ -2,6 +2,8 @@ package net.calzoneman.TileLand.gui;
 
 import java.util.Stack;
 
+import org.lwjgl.opengl.Display;
+
 public class MenuManager {
 	
 	static MenuManager menuManager = new MenuManager();
@@ -42,8 +44,20 @@ public class MenuManager {
 			old = new MainMenu();
 			parentMenus = new Stack<GUIMenu>(); // Reset the menu Stack
 		}
+		else if(menuName.equals("settexturemenu")) {
+			currentMenu = new TextureChooserMenu();
+		}
 		if(old != null)
 			pushParent(old);
+	}
+	
+	public void reInitAll() {
+		for(GUIMenu menu : parentMenus) {
+			menu.reInit(0, 0, Display.getWidth(), Display.getHeight());
+		}
+		if(currentMenu != null) {
+			currentMenu.reInit(0, 0, Display.getWidth(), Display.getHeight());
+		}
 	}
 	
 	public void goBack() {

@@ -27,25 +27,34 @@ public class GUIButton extends GUIComponent {
 	protected String text;
 	protected Delegate<GUIContainer, Void> clickHandler;
 	protected Texture texture;
+	protected boolean enabled;
 
 	public GUIButton(int x, int y, String text) {
-		this(x, y, Renderer.getFont().getWidth(text) + 20, text);
+		this(x, y, TileLand.getResourceManager().getPreferredFont().getWidth(text) + 20, text);
 	}
 	
 	public GUIButton(int x, int y, int width, String text) {
 		this(x, y, width, text, null);
 	}
 	
-	public GUIButton(int x, int y, String text, GUIMenu parent) {
-		this(x, y, Renderer.getFont().getWidth(text) + 20, text, parent);
+	public GUIButton(int x, int y, String text, GUIContainer parent) {
+		this(x, y, TileLand.getResourceManager().getPreferredFont().getWidth(text) + 20, text, parent);
 	}
 	
-	public GUIButton(int x, int y, int width, String text, GUIMenu parent) {
+	public GUIButton(int x, int y, int width, String text, GUIContainer parent) {
 		super(x, y, width, BUTTON_HEIGHT);
 		this.text = text;
 		this.parent = parent;
 		this.texture = TileLand.getResourceManager().getTexture("res/gui/button.png");
-		
+		this.enabled = true;
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 	
 	public void setParent(GUIContainer parent) {
@@ -70,7 +79,7 @@ public class GUIButton extends GUIComponent {
 
 	@Override
 	public void render() {
-		if(isHovered()) {
+		if(isHovered() && isEnabled()) {
 			// Draw left edge
 			Renderer.renderTextureSubrectangle(texture, LEFT_EDGE_HOVER, x, y);
 			// Render center
@@ -90,14 +99,18 @@ public class GUIButton extends GUIComponent {
 		int h = Renderer.getFont().getHeight(text);
 		int sx = this.x + this.width/2 - w/2;
 		int sy = this.y + this.height/2 - h/2;
-		if(isFocused())
-			Renderer.getFont().drawString(sx, sy, TilelandFont.TEXT_YELLOW + text, transparent);
+		if(isFocused() && isEnabled())
+			TileLand.getResourceManager().getPreferredFont().drawString(sx, sy, TilelandFont.TEXT_YELLOW + text, transparent);
+		else if(!isEnabled())
+			TileLand.getResourceManager().getPreferredFont().drawString(sx, sy, TilelandFont.TEXT_GRAY + text, transparent);
 		else
-			Renderer.getFont().drawString(sx, sy, text, transparent);
+			TileLand.getResourceManager().getPreferredFont().drawString(sx, sy, text, transparent);
 	}
 
 	@Override
 	public void onClick() {
+		if(!enabled)
+			return;
 		if(clickHandler != null)
 			clickHandler.run(parent);
 		blur();

@@ -26,13 +26,15 @@ public class LoadLevelMenu extends GUIMenu {
 		int curY = 145;
 		int charHeight = Renderer.getFont().getHeight("|");
 		
-		GUITextbox plyNameTxt = new GUITextbox(x2, curY, 20, "Player");
+		GUITextbox plyNameTxt = new GUITextbox(x2, curY, 190, "Player");
+		plyNameTxt.setMaxLength(32);
 		container.addChild("plynametxt", plyNameTxt);
 		GUILabel plyNameLbl = new GUILabel(x1, curY + plyNameTxt.getHeight()/2 - charHeight/2, "Player name");
 		container.addChild("plynamelbl", plyNameLbl);
 		curY += plyNameTxt.getHeight() + 10;
 		
-		GUITextbox lvlNameTxt = new GUITextbox(x2, curY, 20, "untitled");
+		GUITextbox lvlNameTxt = new GUITextbox(x2, curY, 190, "untitled");
+		lvlNameTxt.setMaxLength(32);
 		container.addChild("lvlnametxt", lvlNameTxt);
 		GUILabel lvlNameLbl = new GUILabel(x1, curY + lvlNameTxt.getHeight()/2 - charHeight/2, "Level name");
 		container.addChild("lvlnamelbl", lvlNameLbl);
@@ -74,54 +76,10 @@ public class LoadLevelMenu extends GUIMenu {
 		String plyName = ((GUITextbox) container.getChild("plynametxt")).getTextOrDefault();
 		String lvlName = ((GUITextbox) container.getChild("lvlnametxt")).getTextOrDefault();
 		children.clear();
-		container = new GUIContainer(Display.getWidth()/2 - 320, Display.getHeight()/2 - 240, 640, 480);
-		int x1 = 175;
-		int x2 = x1 + 100;
-		int curY = 145;
-		int charHeight = Renderer.getFont().getHeight("|");
-		
-		GUITextbox plyNameTxt = new GUITextbox(x2, curY, 20, "Player");
-		plyNameTxt.setText(plyName);
-		container.addChild("plynametxt", plyNameTxt);
-		GUILabel plyNameLbl = new GUILabel(x1, curY + plyNameTxt.getHeight()/2 - charHeight/2, "Player name");
-		container.addChild("plynamelbl", plyNameLbl);
-		curY += plyNameTxt.getHeight() + 10;
-		
-		GUITextbox lvlNameTxt = new GUITextbox(x2, curY, 20, "untitled");
-		lvlNameTxt.setText(lvlName);
-		container.addChild("lvlnametxt", lvlNameTxt);
-		GUILabel lvlNameLbl = new GUILabel(x1, curY + lvlNameTxt.getHeight()/2 - charHeight/2, "Level name");
-		container.addChild("lvlnamelbl", lvlNameLbl);
-		curY += lvlNameTxt.getHeight() + 10;
-		
-		GUIButton cancelBtn = new GUIButton(x1, curY, 135, "Cancel");
-		cancelBtn.setClickHandler(
-				new Delegate<GUIContainer, Void>() {
-					@Override
-					public Void run(GUIContainer param) {
-						MenuManager.getMenuManager().goBack();
-						return null;
-					}
-				});
-		container.addChild("cancelbtn", cancelBtn);
-		GUIButton createBtn = new GUIButton(x1+155, curY, 135, "Load Level");
-		createBtn.setClickHandler(
-				new Delegate<GUIContainer, Void>() {
-					@Override
-					public Void run(GUIContainer param) {
-						((LoadLevelMenu) param.getParent()).loadLevel();
-						return null;
-					}
-				});
-		container.addChild("createbtn", createBtn);
-		curY += createBtn.getHeight() + 10;
-		
-		GUILabel error = new GUILabel(x1, curY, "");
-		container.addChild("error", error);
-		
-		container.setFieldOrder(new String[] { "plynametxt", "lvlnametxt" });
-		container.setParent(this);
-		addChild("container", container);
+		init(x, y, width, height);
+		container = (GUIContainer) getChild("container");
+		((GUITextbox) container.getChild("plynametxt")).setText(plyName);
+		((GUITextbox) container.getChild("lvlnametxt")).setText(lvlName);
 	}
 	
 	@Override

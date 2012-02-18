@@ -81,6 +81,16 @@ public class ResourceManager {
 		}
 	}
 	
+	public HashMap<String, Texture> getTextures(String path) {
+		HashMap<String, Texture> result = new HashMap<String, Texture>();
+		for(String key : textures.keySet()) {
+			if (key.startsWith(path)) {
+				result.put(key, getTexture(key));
+			}
+		}
+		return result;
+	}
+	
 	public Texture getPreferredTiles() {
 		if(preferredTiles == null)
 			return getTexture("res/tiles/default.png");

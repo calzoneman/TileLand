@@ -8,13 +8,13 @@ public class GUIImage extends GUIComponent {
 	protected Texture texture;
 
 	public GUIImage(int x, int y, Texture tex) {
-		super(x, y, tex.getImageHeight(), tex.getImageHeight());
+		super(x, y, tex.getTextureWidth(), tex.getTextureHeight());
 		this.texture = tex;
 	}
 
 	@Override
 	public void render() {
-		Renderer.renderTexture(texture, x, y);
+		Renderer.renderTexture(texture, x, y, width, height);
 	}
 
 }

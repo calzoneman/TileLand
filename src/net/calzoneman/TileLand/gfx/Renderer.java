@@ -241,6 +241,22 @@ public class Renderer {
 		glDisable(GL_BLEND);
 	}
 	
+	public static void renderTexture(Texture tex, int x, int y, int w, int h) {
+		tex.bind();
+		glEnable(GL_BLEND);
+		glBegin(GL_QUADS);
+			glTexCoord2d(0.0D, 0.0D);
+			glVertex2i(x, y);
+			glTexCoord2d(1.0D, 0.0D);
+			glVertex2i(x+w, y);
+			glTexCoord2d(1.0D, 1.0D);
+			glVertex2i(x+w, y+h);
+			glTexCoord2d(0.0D, 1.0D);
+			glVertex2i(x, y+h);
+		glEnd();
+		glDisable(GL_BLEND);
+	}
+	
 	/**
 	 * Renders a subrectangle of a Texture
 	 * @param tex The texture to bind

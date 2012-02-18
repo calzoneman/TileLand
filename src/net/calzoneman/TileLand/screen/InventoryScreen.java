@@ -20,9 +20,9 @@ public class InventoryScreen extends GameScreen {
 	private GUIButton saveButton;
 	private GUIButton quitButton;
 	
-	private boolean[] oldmouse;
-	private boolean[] mouse;
-	private boolean[] keys;
+	//private boolean[] oldmouse;
+	//private boolean[] mouse;
+	//private boolean[] keys;
 	
 	public InventoryScreen() {
 		this(10, 57, 10 * Level.TILESIZE + 11 * SLOT_PADDING, 3 * Level.TILESIZE + 4 * SLOT_PADDING);
@@ -30,9 +30,9 @@ public class InventoryScreen extends GameScreen {
 
 	public InventoryScreen(int x, int y, int width, int height) {
 		super(x, y, width, height);
-		this.keys = new boolean[256]; // Keyboard.getKeyCount() seems to have issues...
-		this.mouse = new boolean[Mouse.getButtonCount()];
-		this.oldmouse = new boolean[Mouse.getButtonCount()];
+		//this.keys = new boolean[256]; // Keyboard.getKeyCount() seems to have issues...
+		//this.mouse = new boolean[Mouse.getButtonCount()];
+		//this.oldmouse = new boolean[Mouse.getButtonCount()];
 		this.saveButton = new GUIButton(Display.getWidth()-150, Display.getHeight()-120, 100, "Save");
 		this.quitButton = new GUIButton(Display.getWidth()-150, Display.getHeight()-80, 100, "Quit");
 	}
@@ -40,7 +40,7 @@ public class InventoryScreen extends GameScreen {
 	@Override
 	public void handleInput() {
 		PlayerInventory inv = parent.getPlayer().getPlayerInventory();
-		oldmouse = mouse.clone();
+		boolean[] oldmouse = mouse.clone();
 		while(Mouse.next()) {
 			// Update mouse button state
 			if(Mouse.getEventButton() != -1) {

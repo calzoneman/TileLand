@@ -119,6 +119,10 @@ public class GUIContainer extends GUIComponent {
 		return children.get(name);
 	}
 	
+	public GUIComponent getFocused() {
+		return focused;
+	}
+	
 	/**
 	 * Renders the component
 	 * By default, calls render() on each component
@@ -203,14 +207,16 @@ public class GUIContainer extends GUIComponent {
 				lastKey = key;
 				lastKeyChar = ke.keyChar;
 			}
+			if(key != -1 && !keys[key]) {
+				lastKeyTime = System.nanoTime();
+				lastKey = -1;
+				lastKeyChar = Keyboard.CHAR_NONE;
+			}
 		}
 		
-		// Check for held down keys
-		for(int k = 0; k < keys.length; k++) {
-			if(keys[k] && k == lastKey && System.nanoTime() > lastKeyTime + KEY_WAIT)
-				keypress(k, lastKeyChar);
-		}
-		
+		if(lastKey != -1 && keys[lastKey] && System.nanoTime() > lastKeyTime + KEY_WAIT)
+			keypress(lastKey, lastKeyChar);
+	
 		// Check for nested containers
 		for(GUIComponent comp : children.values()) {
 			if(comp instanceof GUIContainer) {
@@ -372,5 +378,9 @@ public class GUIContainer extends GUIComponent {
 			this.keyChar = keyChar;
 			this.keyState = keyState;
 		}
+	}
+
+	public int getNumChildren() {
+		return children.values().size();
 	}
 }
