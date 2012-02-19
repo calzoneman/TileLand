@@ -15,8 +15,6 @@ import org.newdawn.slick.opengl.Texture;
 
 
 public class Tile extends Item implements Renderable {
-	/** The id of the tiletype.  In saves this is a short, but making it int here will save loads of unnecessary casting */
-	private int id;
 	/** A human readable string identifying the Tile */
 	private String name;
 	/** The tilesheet texture to be used */
@@ -37,7 +35,7 @@ public class Tile extends Item implements Renderable {
 	}
 	
 	public Tile(int id, String name, Texture tex, Rectangle texPosition, int properties) {
-		this.id = id;
+		super((short) id);
 		this.name = name;
 		this.tex = tex;
 		this.texPosition = texPosition;
@@ -45,14 +43,6 @@ public class Tile extends Item implements Renderable {
 	}
 	
 	public void updateData(Layer level, Location self) { }
-	
-	/**
-	 * Getter for the id field
-	 * @return The id of the Tile
-	 */
-	public int getId() {
-		return id;
-	}
 	
 	/**
 	 * Getter for the name field

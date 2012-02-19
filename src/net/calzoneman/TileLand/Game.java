@@ -9,16 +9,20 @@ import net.calzoneman.TileLand.screen.GameScreen;
 import net.calzoneman.TileLand.screen.MainScreen;
 
 public class Game {
-	private Player player;
-	private MainScreen mainScreen;
-	private GameScreen currentScreen = null;
-	private ChatScreen chatScreen;
+	protected Player player;
+	protected MainScreen mainScreen;
+	protected GameScreen currentScreen = null;
+	protected ChatScreen chatScreen;
 	
 	public Game(Player player) {
 		this.player = player;
 		this.mainScreen = new MainScreen(this);
 		this.chatScreen = new ChatScreen(10, Display.getHeight() - 180, 480, 180);
 		chatScreen.setParent(this);
+	}
+	
+	public boolean isMultiplayer() {
+		return false;
 	}
 	
 	public void openChat() {

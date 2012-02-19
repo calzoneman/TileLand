@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.calzoneman.TileLand.TileLand;
+import net.calzoneman.TileLand.event.EventManager;
 import net.calzoneman.TileLand.gfx.Renderer;
 import net.calzoneman.TileLand.gfx.TilelandFont;
 import net.calzoneman.TileLand.gui.GUITextbox;
@@ -102,7 +103,9 @@ public class ChatScreen extends GameScreen {
 				keys[Keyboard.getEventKey()] = Keyboard.getEventKeyState();
 			}
 			if(keys[Keyboard.KEY_RETURN]) {
-				addMessage(parent.getPlayer().getName() + TilelandFont.TEXT_WHITE + ": " + inputBox.getText());
+				if(!parent.isMultiplayer())
+					addMessage(parent.getPlayer().getName() + TilelandFont.TEXT_WHITE + ": " + inputBox.getText());
+				EventManager.manager.onPlayerChat(parent, inputBox.getText());
 				inputBox.setText("");
 				active = false;
 				return;
