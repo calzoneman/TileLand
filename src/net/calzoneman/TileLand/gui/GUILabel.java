@@ -1,5 +1,6 @@
 package net.calzoneman.TileLand.gui;
 
+import net.calzoneman.TileLand.TileLand;
 import net.calzoneman.TileLand.gfx.Renderer;
 
 public class GUILabel extends GUIComponent {
@@ -9,6 +10,11 @@ public class GUILabel extends GUIComponent {
 	public GUILabel(int x, int y, String text) {
 		super(x, y, Renderer.getFont().getWidth(text), Renderer.getFont().getHeight(text));
 		this.text = text;
+	}
+	
+	@Override
+	public int getWidth() {
+		return TileLand.getResourceManager().getPreferredFont().getWidth(text);
 	}
 	
 	public String getText() {
@@ -22,7 +28,7 @@ public class GUILabel extends GUIComponent {
 
 	@Override
 	public void render() {
-		Renderer.getFont().drawString(x, y, text);
+		TileLand.getResourceManager().getPreferredFont().drawString(x, y, text);
 	}
 
 }

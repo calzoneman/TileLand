@@ -45,7 +45,15 @@ public class MainMenu extends GUIMenu {
 				});
 		container.addChild("loadgame", loadLvlBtn);
 		GUIButton multiplayerBtn = new GUIButton(170, 280, 300, "Multiplayer");
-		multiplayerBtn.setEnabled(false);
+		//multiplayerBtn.setEnabled(false);
+		multiplayerBtn.setClickHandler(
+				new Delegate<GUIContainer, Void>() {
+					@Override
+					public Void run(GUIContainer param) {
+						MenuManager.getMenuManager().openMenu("mplogin");
+						return null;
+					}
+				});
 		container.addChild("multiplayer", multiplayerBtn);
 		GUIButton setTextureBtn = new GUIButton(170, 320, 300, "Select Texture");
 		setTextureBtn.setClickHandler(

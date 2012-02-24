@@ -47,6 +47,6 @@ public class SingleplayerGame extends GUIMenu {
 	@Override
 	public void handleInput() {
 		if(game != null)
-			game.handleInput();
+			game.tick();
 	}
 }

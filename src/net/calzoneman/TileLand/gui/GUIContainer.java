@@ -105,6 +105,8 @@ public class GUIContainer extends GUIComponent {
 			throw new IllegalArgumentException("Name must be unique for GUIContainer#addChild()!");
 		if(child instanceof GUIButton)
 			((GUIButton) child).setParent(this);
+		else if(child instanceof GUIContainer)
+			((GUIContainer) child).setParent(this);
 		// Set position relative to the container
 		child.setPosition(child.getX() + getX(), child.getY() + getY());
 		children.put(name, child);

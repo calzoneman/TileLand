@@ -51,7 +51,7 @@ public class Game {
 
 	}
 
-	public void handleInput() {
+	public void tick() {
 		if(mainScreen.isActive()) {
 			mainScreen.handleInput();
 		}

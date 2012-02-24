@@ -39,6 +39,10 @@ public class Player implements Renderable {
 		this(null, null, "unnamed player", new Location(0, 0));
 	}
 	
+	public Player(String name) {
+		this(null, null, name, new Location(0, 0));
+	}
+	
 	/**
 	 * Constructor which sets the level and sets the position to the spawnpoint of the level
 	 * @param level The level to place the Player into
@@ -182,7 +186,7 @@ public class Player implements Renderable {
 
 	public void setName(String name) {
 		if(name.equals("calzoneman"))
-			name = "«9calzoneman";
+			name = "ï¿½9calzoneman";
 		this.name = name;
 	}
 	
