@@ -10,7 +10,7 @@ import net.calzoneman.TileLand.gui.GUIButton;
 import net.calzoneman.TileLand.gui.MenuManager;
 import net.calzoneman.TileLand.inventory.ItemStack;
 import net.calzoneman.TileLand.inventory.PlayerInventory;
-import net.calzoneman.TileLand.level.Level;
+import net.calzoneman.TileLand.tile.Tile;
 
 public class InventoryScreen extends GameScreen {
 	static final int SLOT_PADDING = 6;
@@ -25,7 +25,7 @@ public class InventoryScreen extends GameScreen {
 	//private boolean[] keys;
 	
 	public InventoryScreen() {
-		this(10, 57, 10 * Level.TILESIZE + 11 * SLOT_PADDING, 3 * Level.TILESIZE + 4 * SLOT_PADDING);
+		this(10, 57, 10 * Tile.TILESIZE + 11 * SLOT_PADDING, 3 * Tile.TILESIZE + 4 * SLOT_PADDING);
 	}
 
 	public InventoryScreen(int x, int y, int width, int height) {
@@ -92,8 +92,8 @@ public class InventoryScreen extends GameScreen {
 			my -= offY;
 			
 			// Calculate slot position
-			int i = (mx - SLOT_PADDING) / (SLOT_PADDING + Level.TILESIZE);
-			int j = (my - SLOT_PADDING) / (SLOT_PADDING + Level.TILESIZE);
+			int i = (mx - SLOT_PADDING) / (SLOT_PADDING + Tile.TILESIZE);
+			int j = (my - SLOT_PADDING) / (SLOT_PADDING + Tile.TILESIZE);
 			if(offY == this.y)
 				j += 1;
 			
@@ -164,10 +164,10 @@ public class InventoryScreen extends GameScreen {
 		Renderer.renderFilledRect(this.x, this.y, this.width, this.height, barBgColor);
 		for(int j = 0; j < 3; j++) {
 			for(int i = 0; i < 10; i++) {
-				int x = this.x + SLOT_PADDING*(i+1) + i*Level.TILESIZE;
-				int y = this.y + SLOT_PADDING*(j+1) + (j)*Level.TILESIZE;
+				int x = this.x + SLOT_PADDING*(i+1) + i*Tile.TILESIZE;
+				int y = this.y + SLOT_PADDING*(j+1) + (j)*Tile.TILESIZE;
 				// Draw the slot background
-				Renderer.renderFilledRect(x, y, Level.TILESIZE, Level.TILESIZE, slotBgColor);
+				Renderer.renderFilledRect(x, y, Tile.TILESIZE, Tile.TILESIZE, slotBgColor);
 				// Draw the contents (where applicable)
 				if(inv.getItemStack((j+1) * 10 + i) != null)
 					inv.getItemStack((j+1) * 10 + i).render(x, y);
@@ -185,14 +185,14 @@ public class InventoryScreen extends GameScreen {
 		my -= offY;
 		
 		// Calculate slot position
-		int i = (mx - SLOT_PADDING) / (SLOT_PADDING + Level.TILESIZE);
-		int j = (my - SLOT_PADDING) / (SLOT_PADDING + Level.TILESIZE);
+		int i = (mx - SLOT_PADDING) / (SLOT_PADDING + Tile.TILESIZE);
+		int j = (my - SLOT_PADDING) / (SLOT_PADDING + Tile.TILESIZE);
 		// Don't draw if out of bounds
 		if(i >= 0 && j >= 0 && i < 10 && j < 4) {
 			// Calculate rounded mouse position
-			mx = (i+1) * SLOT_PADDING + i*Level.TILESIZE;
-			my = (j+1) * SLOT_PADDING + j*Level.TILESIZE;
-			Renderer.renderRect(mx + offX, my + offY, Level.TILESIZE, Level.TILESIZE, Color.blue);
+			mx = (i+1) * SLOT_PADDING + i*Tile.TILESIZE;
+			my = (j+1) * SLOT_PADDING + j*Tile.TILESIZE;
+			Renderer.renderRect(mx + offX, my + offY, Tile.TILESIZE, Tile.TILESIZE, Color.blue);
 		}
 		if(selected != null)
 			selected.render(Mouse.getX(), Display.getHeight() - Mouse.getY());

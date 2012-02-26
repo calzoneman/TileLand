@@ -4,7 +4,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 import org.newdawn.slick.opengl.Texture;
 
-public class PlayerSprite implements Renderable {
+public class PlayerSprite {
 	public static final int FACING_UP = 0;
 	public static final int FACING_RIGHT = 1;
 	public static final int FACING_DOWN = 2;
@@ -56,10 +56,5 @@ public class PlayerSprite implements Renderable {
 			glVertex2f(x, y + PLAYER_HEIGHT);
 		glEnd();
 		glDisable(GL_BLEND);
-	}
-
-	@Override
-	public void render(int x, int y, int data) {
-		render(x, y);
 	}
 }

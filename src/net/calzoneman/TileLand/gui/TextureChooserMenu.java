@@ -52,7 +52,7 @@ public class TextureChooserMenu extends GUIMenu {
 	public void save() {
 		if(listView.getSelected() != null) {
 			TileLand.getResourceManager().setPreferredTiles(listView.getSelected().<String>getData("path"));
-			TileTypes.init();
+			//TileTypes.init();
 		}
 		MenuManager.getMenuManager().goBack();
 	}

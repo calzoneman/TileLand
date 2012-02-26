@@ -92,7 +92,7 @@ public abstract class Layer {
 	 * @return True if the tile at (x, y) is set to t, else false
 	 */
 	public boolean setTile(int x, int y, Tile t) {
-		return setId(x, y, t.getId());
+		return setId(x, y, t.id);
 	}
 	
 	/**

@@ -2,12 +2,10 @@ package net.calzoneman.TileLand.player;
 
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.Color;
 
 import net.calzoneman.TileLand.gfx.PlayerSprite;
-import net.calzoneman.TileLand.gfx.Renderable;
 import net.calzoneman.TileLand.gfx.Renderer;
 import net.calzoneman.TileLand.inventory.Item;
 import net.calzoneman.TileLand.inventory.Inventory;
@@ -16,10 +14,11 @@ import net.calzoneman.TileLand.inventory.PlayerInventory;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 import net.calzoneman.TileLand.tile.Tile;
-import net.calzoneman.TileLand.tile.TileId;
-import net.calzoneman.TileLand.tile.TileTypes;
 
-public class Player implements Renderable {
+public class Player {
+	
+	public static final int POSITION_FACTOR = 0;
+	
 	/** The name of the Player */
 	private String name;
 	/** The player sprite */
@@ -84,43 +83,35 @@ public class Player implements Renderable {
 		this.setName(name);
 		this.setPosition(position);
 		this.inventory = new PlayerInventory();
-			inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.SNOWY_GRASS), 100));
-			inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.COBBLESTONE_ROAD), 100));
-			inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.BUSH), 100));
-			inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.SIGN), 100));
+			//inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.SNOWY_GRASS), 100));
+			//inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.COBBLESTONE_ROAD), 100));
+			//inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.BUSH), 100));
+			//inventory.addItemStack(new ItemStack(TileTypes.getTile(TileId.SIGN), 100));
 	}
 	
 	public boolean move(int currentMoveKey) {
 		String move = "";
 		switch(currentMoveKey) {
 			case Keyboard.KEY_W:
-				if(position.y-1 < 0)
-					break;
-				Tile up = level.getFg(position.x, position.y-1);
+				Tile up = level.getFg(position.x >> POSITION_FACTOR, (position.y-1) >> POSITION_FACTOR);
 				if(up == null || up.isSolid())
 					break;
 				move = "up";
 				break;
 			case Keyboard.KEY_S:
-				if(position.y+1 >= level.getHeight())
-					break;
-				Tile down = level.getFg(position.x, position.y+1);
+				Tile down = level.getFg(position.x >> POSITION_FACTOR, position.y+1);
 				if(down == null || down.isSolid())
 					break;
 				move = "down";
 				break;
 			case Keyboard.KEY_A:
-				if(position.x-1 < 0)
-					break;
-				Tile left = level.getFg(position.x-1, position.y);
+				Tile left = level.getFg((position.x-1) >> POSITION_FACTOR, position.y >> POSITION_FACTOR);
 				if(left == null || left.isSolid())
 					break;
 				move = "left";
 				break;
 			case Keyboard.KEY_D:
-				if(position.x+1 >= level.getWidth())
-					break;
-				Tile right = level.getFg(position.x+1, position.y);
+				Tile right = level.getFg((position.x+1) >> POSITION_FACTOR, position.y >> POSITION_FACTOR);
 				if(right == null || right.isSolid())
 					break;
 				move = "right";
@@ -175,6 +166,10 @@ public class Player implements Renderable {
 	public Location getPosition() {
 		return position;
 	}
+	
+	public Location getTilePosition() {
+		return new Location(position.x >> POSITION_FACTOR, position.y >> POSITION_FACTOR);
+	}
 
 	public void setPosition(Location position) {
 		this.position = new Location(position); // Create a new instance of Location so we aren't modifying the original input
@@ -191,7 +186,10 @@ public class Player implements Renderable {
 	}
 	
 	public Item getHeldItem() {
-		return this.inventory.getQuickbar().getSelectedItemStack().getItem();
+		ItemStack it = inventory.getQuickbar().getSelectedItemStack();
+		if(it == null)
+			return null;
+		return it.getItem();
 	}
 	
 	public PlayerInventory getPlayerInventory() {
@@ -202,33 +200,14 @@ public class Player implements Renderable {
 		return this.inventory;
 	}
 
-	@Override
 	public void render(int x, int y) {
 		// Draw the player sprite
-		this.sprite.render(x, y - (PlayerSprite.PLAYER_HEIGHT - Level.TILESIZE));
-	}
-	
-	public void renderNameCentered() {
+		this.sprite.render(x, y - (PlayerSprite.PLAYER_HEIGHT - Tile.TILESIZE));
 		int w = Renderer.getFont().getWidth(name);
-		int h = Renderer.getFont().getHeight(name);
-		int x = Display.getWidth()/2  - w/2 + Level.TILESIZE/2;
-		int y = Display.getHeight()/2 - h - Level.TILESIZE;
-		Renderer.renderString(x, y, name, Color.black);
-		/*
-		Color.black.bind();
-		glBegin(GL_QUADS);
-			glVertex2f(x, y);
-			glVertex2f(x+w, y);
-			glVertex2f(x+w, y+h);
-			glVertex2f(x, y+h);
-		glEnd();
-		glEnable(GL_BLEND);
-		font.drawString(x, y, name);
-		glDisable(GL_BLEND);*/
+		int sx = x + PlayerSprite.PLAYER_WIDTH / 2 - w/2;
+		int sy = y - PlayerSprite.PLAYER_HEIGHT;
+		Renderer.renderString(sx, sy, name, Color.black);
 	}
-	
-	@Override
-	public void render(int x, int y, int data) { }
 
 	public int getFacing() {
 		return facing;
