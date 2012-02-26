@@ -3,7 +3,7 @@ package net.calzoneman.TileLand.inventory;
 import org.newdawn.slick.Color;
 
 import net.calzoneman.TileLand.gfx.Renderer;
-import net.calzoneman.TileLand.level.Level;
+import net.calzoneman.TileLand.tile.Tile;
 
 public class Quickbar {
 	public static final int QUICKBAR_COUNT = 10;
@@ -18,7 +18,7 @@ public class Quickbar {
 	private Color barBgColor = new Color(0.4f, 0.4f, 0.4f, 0.5f);
 	
 	public Quickbar() {
-		this(10, 10, 10 * Level.TILESIZE + 11 * SLOT_PADDING, Level.TILESIZE + 2 * SLOT_PADDING);
+		this(10, 10, 10 * Tile.TILESIZE + 11 * SLOT_PADDING, Tile.TILESIZE + 2 * SLOT_PADDING);
 	}
 	
 	public Quickbar(int x, int y, int width, int height) {
@@ -95,16 +95,16 @@ public class Quickbar {
 		// Draw the quickbar's background
 		Renderer.renderFilledRect(this.x, this.y, this.width, this.height, barBgColor);
 		for(int i = 0; i < QUICKBAR_COUNT; i++) {
-			int x = this.x + SLOT_PADDING*(i+1) + i*Level.TILESIZE;
+			int x = this.x + SLOT_PADDING*(i+1) + i*Tile.TILESIZE;
 			int y = this.y + SLOT_PADDING;
 			// Draw the slot background
-			Renderer.renderFilledRect(x, y, Level.TILESIZE, Level.TILESIZE, slotBgColor);
+			Renderer.renderFilledRect(x, y, Tile.TILESIZE, Tile.TILESIZE, slotBgColor);
 			// Draw the contents (where applicable)
 			if(contents[i] != null)
 				contents[i].render(x, y);
 			// Draw the selection border
 			if(i == selected)
-				Renderer.renderRect(x, y, Level.TILESIZE, Level.TILESIZE, Color.green);
+				Renderer.renderRect(x, y, Tile.TILESIZE, Tile.TILESIZE, Color.green);
 		}
 	}
 }

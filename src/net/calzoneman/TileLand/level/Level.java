@@ -16,8 +16,6 @@ public class Level {
 	public static final int SAVE_MAGIC = 0x54494c45; // "TILE" in ASCII hex
 	/** The file format version */
 	public static final byte SAVE_VERSION = 0x05;
-	/** Constant for the dimension of a Tile texture */
-	public static final int TILESIZE = 32;
 	/** The width of the Level, in tiles */
 	private int width = 0;
 	/** The height of the Level, in tiles */
@@ -200,9 +198,7 @@ public class Level {
 	 * @return true if the setting was successful, false otherwise
 	 */
 	public boolean setBgId(int x, int y, int id) {
-		if(backgroundLayer.setId(x, y, id))
-			updateBgData(new Location(x, y));
-		return true;
+		return backgroundLayer.setId(x, y, id);
 	}
 	
 	/**
@@ -215,11 +211,7 @@ public class Level {
 	public boolean setBg(int x, int y, Tile t) {
 		if(t == null)
 			return false;
-		if(backgroundLayer.setTile(x, y, t)) {
-			updateBgData(new Location(x, y));
-			return true;
-		}
-		return false;
+		return backgroundLayer.setTile(x, y, t);
 	}
 	
 	/**
@@ -241,22 +233,6 @@ public class Level {
 	 */
 	public boolean setBgData(int x, int y, int data) {
 		return backgroundLayer.setData(x, y, data);
-	}
-	
-	/**
-	 * Updates data on the background layer
-	 * @param src The Location to update
-	 */
-	public void updateBgData(Location src) {
-		getBg(src.x, src.y).updateData(backgroundLayer, src);
-		if(src.x + 1 < width)
-			getBg(src.x + 1, src.y).updateData(backgroundLayer, new Location(src.x + 1, src.y));
-		if(src.x - 1 >= 0)
-			getBg(src.x - 1, src.y).updateData(backgroundLayer, new Location(src.x - 1, src.y));
-		if(src.y + 1 < height)
-			getBg(src.x, src.y + 1).updateData(backgroundLayer, new Location(src.x, src.y + 1));
-		if(src.y - 1 >= 0)
-			getBg(src.x, src.y - 1).updateData(backgroundLayer, new Location(src.x, src.y - 1));
 	}
 
 	/**
@@ -287,9 +263,7 @@ public class Level {
 	 * @return true if the setting was successful, false otherwise
 	 */
 	public boolean setFgId(int x, int y, int id) {
-		if(foregroundLayer.setId(x, y, id))
-			updateFgData(new Location(x, y));
-		return true;
+		return foregroundLayer.setId(x, y, id);
 	}
 	
 	/**
@@ -302,11 +276,7 @@ public class Level {
 	public boolean setFg(int x, int y, Tile t) {
 		if(t == null)
 			return false;
-		if(foregroundLayer.setTile(x, y, t)) {
-			updateFgData(new Location(x, y));
-			return true;
-		}
-		return false;
+		return foregroundLayer.setTile(x, y, t);
 	}
 	
 	/**
@@ -328,36 +298,6 @@ public class Level {
 	 */
 	public boolean setFgData(int x, int y, int data) {
 		return foregroundLayer.setData(x, y, data);
-	}
-	
-	/**
-	 * Updates neighbors on the foreground layer
-	 * @param src The Location to update
-	 */
-	public void updateFgData(Location src) {
-		getFg(src.x, src.y).updateData(foregroundLayer, src);
-		if(src.x + 1 < width)
-			getFg(src.x + 1, src.y).updateData(foregroundLayer, new Location(src.x + 1, src.y));
-		if(src.x - 1 >= 0)
-			getFg(src.x - 1, src.y).updateData(foregroundLayer, new Location(src.x - 1, src.y));
-		if(src.y + 1 < height)
-			getFg(src.x, src.y + 1).updateData(foregroundLayer, new Location(src.x, src.y + 1));
-		if(src.y - 1 >= 0)
-			getFg(src.x, src.y - 1).updateData(foregroundLayer, new Location(src.x, src.y - 1));
-	}
-	
-	/**
-	 * General tile setting method.  Infers layer from Tile.isForeground()
-	 * @param x
-	 * @param y
-	 * @param t
-	 * @return
-	 */
-	public boolean setTile(int x, int y, Tile t) {
-		if(t.isForeground())
-			return setFg(x, y, t);
-		else
-			return setBg(x, y, t);
 	}
 	
 	public int getWidth() {

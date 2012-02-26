@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.calzoneman.TileLand.Game;
-import net.calzoneman.TileLand.action.TileEditResult;
 import net.calzoneman.TileLand.level.Location;
 
 public class EventManager {
@@ -23,15 +22,15 @@ public class EventManager {
 		}
 	}
 	
-	public void onPlayerPlaceTile(Game game, Location pos, TileEditResult result) {
+	public void onPlayerPlaceTile(Game game, Location pos, short id) {
 		for(EventHandler handler : handlers) {
-			handler.onPlayerPlaceTile(game, pos, result);
+			handler.onPlayerPlaceTile(game, pos, id);
 		}
 	}
 	
-	public void onPlayerDeleteTile(Game game, Location pos, TileEditResult result) {
+	public void onPlayerDeleteTile(Game game, Location pos, short id) {
 		for(EventHandler handler : handlers) {
-			handler.onPlayerDeleteTile(game, pos, result);
+			handler.onPlayerDeleteTile(game, pos, id);
 		}
 	}
 	
