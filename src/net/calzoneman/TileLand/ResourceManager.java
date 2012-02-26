@@ -3,6 +3,7 @@ package net.calzoneman.TileLand;
 import java.io.File;
 import java.util.HashMap;
 
+import net.calzoneman.TileLand.gfx.SpriteSheet;
 import net.calzoneman.TileLand.gfx.TilelandFont;
 
 import org.newdawn.slick.SlickException;
@@ -14,6 +15,7 @@ import org.newdawn.slick.util.ResourceLoader;
 
 public class ResourceManager {
 	private HashMap<String, Texture> textures;
+	private HashMap<String, SpriteSheet> tileSpritesheets;
 	private HashMap<String, TilelandFont> fonts;
 	private TilelandFont preferredFont = null;
 	private Texture preferredTiles = null;
@@ -27,6 +29,7 @@ public class ResourceManager {
 	
 	public ResourceManager(String sourcefolder) {
 		textures = new HashMap<String, Texture>();
+		tileSpritesheets = new HashMap<String, SpriteSheet>();
 		fonts = new HashMap<String, TilelandFont>();
 		processFolder(sourcefolder, true);
 		dump();

@@ -1,10 +1,9 @@
 package net.calzoneman.TileLand.inventory;
 
-import net.calzoneman.TileLand.gfx.Renderable;
 import net.calzoneman.TileLand.gfx.Renderer;
 import net.calzoneman.TileLand.gfx.TilelandFont;
 
-public class ItemStack implements Cloneable, Renderable {
+public class ItemStack implements Cloneable {
 	public static final int MAX_STACK_SIZE = 100;
 	
 	private Item item;
@@ -65,19 +64,14 @@ public class ItemStack implements Cloneable, Renderable {
 		return new ItemStack(item, count, data);
 	}
 
-	@Override
 	public void render(int x, int y) {
 		// Draw the item
 		if(item != null) {
-			item.render(x, y, data);
+			item.render(x, y);
 		}
 		
 		// Draw the count
 		if(count > 1)
 			Renderer.getFont().drawString(x, y, TilelandFont.TEXT_YELLOW + count);
-	}
-
-	@Override
-	public void render(int x, int y, int data) {
 	}
 }

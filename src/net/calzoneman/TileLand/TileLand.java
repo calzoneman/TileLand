@@ -8,9 +8,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.calzoneman.TileLand.gfx.Renderer;
+import net.calzoneman.TileLand.gfx.SpriteSheet;
 import net.calzoneman.TileLand.gui.MenuManager;
 import net.calzoneman.TileLand.tile.TileTypes;
 
@@ -20,7 +22,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 public class TileLand {	
-	public static final String version = "0.21a_01";
+	public static final String version = "0.21a_02";
 	static AtomicReference<Dimension> newSize = new AtomicReference<Dimension>();
 	static boolean closeRequested = false;
 	static final Dimension DEFAULT_DIMENSION = new Dimension(640, 480);
@@ -69,10 +71,13 @@ public class TileLand {
 			}
 			rm = new ResourceManager();
 			Renderer.setFont(rm.getDefaultFont());
-			TileTypes.init();
+			TileTypes.init(new SpriteSheet("res/tiles/default.png", 32));
 		} 
 		catch (LWJGLException e1) {
 			Sys.alert("Tileland", "Error initializing AWT Canvas");
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		MenuManager mm = MenuManager.getMenuManager();

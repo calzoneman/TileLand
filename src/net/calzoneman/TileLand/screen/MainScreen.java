@@ -1,17 +1,15 @@
 package net.calzoneman.TileLand.screen;
 
 import net.calzoneman.TileLand.Game;
-import net.calzoneman.TileLand.action.ActionResult;
-import net.calzoneman.TileLand.action.TileEditResult;
 import net.calzoneman.TileLand.event.EventManager;
 import net.calzoneman.TileLand.gfx.Renderer;
 import net.calzoneman.TileLand.inventory.ItemStack;
+import net.calzoneman.TileLand.inventory.TileItem;
 import net.calzoneman.TileLand.level.Level;
 import net.calzoneman.TileLand.level.Location;
 import net.calzoneman.TileLand.player.Player;
 import net.calzoneman.TileLand.tile.Tile;
-import net.calzoneman.TileLand.tile.TileId;
-import net.calzoneman.TileLand.tile.TileTypes;
+import net.calzoneman.TileLand.tile.TypeId;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -22,7 +20,6 @@ public class MainScreen extends GameScreen {
 	
 	private int currentMoveKey;
 	private long lastMoveTime;
-	private long lastClickTime;
 	
 	static final long CLICK_DELAY = 50000000L;
 	
@@ -34,7 +31,6 @@ public class MainScreen extends GameScreen {
 		super(0, 0, Display.getWidth(), Display.getHeight(), parent);
 		this.currentMoveKey = -1;
 		this.lastMoveTime = 0;
-		this.lastClickTime = 0;
 	}
 	
 	@Override
@@ -49,7 +45,7 @@ public class MainScreen extends GameScreen {
 			// Update mouse button state
 			if(Mouse.getEventButton() != -1)
 				mouse[Mouse.getEventButton()] = Mouse.getEventButtonState();
-			useItem(ply, Mouse.getEventX(), Mouse.getEventY());
+			click(ply, Mouse.getEventX(), Mouse.getEventY());
 		}
 	}
 
@@ -113,109 +109,56 @@ public class MainScreen extends GameScreen {
 		if(System.currentTimeMillis() >= lastMoveTime + 100 || keys[Keyboard.KEY_LSHIFT]) {
 			if(ply.move(currentMoveKey)) {
 				EventManager.manager.onPlayerMove(parent, ply.getPosition(), ply.getFacing());
-				useItem(ply, Mouse.getX(), Mouse.getY());
+				click(ply, Mouse.getX(), Mouse.getY());
 				lastMoveTime = System.currentTimeMillis();
 			}
 		}
 	}
 	
-	private void useItem(Player ply, int mouseX, int mouseY) {
-		Location position = ply.getPosition();
-		Level level = ply.getLevel();
+	private void click(Player ply, int mouseX, int mouseY) {
 		if(!mouse[0] && !mouse[1])
 			return;
+		Location position = ply.getTilePosition();
+		Level level = ply.getLevel();
 		// Mouse offset in the level
 		Location offset = new Location(
-				position.x - Display.getWidth() / Level.TILESIZE / 2,
-				position.y - Display.getHeight() / Level.TILESIZE / 2);
+				position.x - Display.getWidth() / Tile.TILESIZE / 2,
+				position.y - Display.getHeight() / Tile.TILESIZE / 2);
 		// tx and ty are the coordinates for the tile under the mouse cursor
-		int tx = mouseX / Level.TILESIZE + offset.x;
-		int ty = (Display.getHeight() - mouseY) / Level.TILESIZE + offset.y;
-		if(ply.getHeldItem() instanceof Tile && !(tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight())) {
-			Tile held = (Tile) ply.getHeldItem();
-			// You can't place null!  (You can break with it though)
-			if(held == null && mouse[0])
-				return;
-			// Why would you even do this [placing a tile on top of you]
-			if(held.isSolid() && tx == position.x && ty == position.y)
-				return;
-			// Limit time spacing
-			if(System.nanoTime() < lastClickTime + CLICK_DELAY)
-				return;
-			TileEditResult result = null;
-			if(mouse[0])
-				result = placeTile(ply, tx, ty);
-			else if (mouse[1])
-				result = deleteTile(ply, tx, ty);
-			if(result != null && result.getResultCode() != ActionResult.FAILURE) {
-				lastClickTime = System.nanoTime();
-				if(result.getResultCode() == ActionResult.TILE_BREAK) {
-					EventManager.manager.onPlayerDeleteTile(parent, new Location(tx, ty), result);
+		int tx = mouseX / Tile.TILESIZE + offset.x;
+		int ty = (Display.getHeight() - mouseY) / Tile.TILESIZE + offset.y;
+		
+		if(tx < 0 || ty < 0 || tx >= level.getWidth() || ty >= level.getHeight())
+			return;
+		
+		if(mouse[1]) {
+			int fg = level.getFgId(tx, ty);
+			if(fg != -1 && fg != TypeId.AIR) {
+				level.getFg(tx, ty).hit(level, ply, ply.getHeldItem(), tx, ty);
+			}
+			else {
+				level.getBg(tx, ty).hit(level, ply, ply.getHeldItem(), tx, ty);
+			}
+		}
+		else if(mouse[0] && tx >= 0 && ty >= 0 && tx < level.getWidth() && ty < level.getHeight()) {
+			if(ply.getHeldItem() instanceof TileItem) {
+				TileItem it = (TileItem) ply.getHeldItem();
+				if(it.getTile().isForeground()) {
+					if(level.getFgId(tx, ty) == TypeId.AIR && tx != ply.getTilePosition().x && ty != ply.getTilePosition().y) { 
+						level.setFg(tx, ty, it.getTile());
+						level.setFgData(tx, ty, it.getData());
+						ply.getInventory().removeOneItem(ply.getPlayerInventory().getQuickbar().getSelectedSlot());
+					}
 				}
-				else if(result.getResultCode() == ActionResult.TILE_PLACE) {
-					EventManager.manager.onPlayerPlaceTile(parent, new Location(tx, ty), result);
+				else {
+					if(level.getBgId(tx, ty) != it.getTile().id) {
+						level.setBg(tx, ty, it.getTile());
+						level.setBgData(tx, ty, it.getData());
+						ply.getInventory().removeOneItem(ply.getPlayerInventory().getQuickbar().getSelectedSlot());
+					}
 				}
 			}
 		}
-	}
-	
-	public TileEditResult placeTile(Player ply, int x, int y) {
-		Level lvl = ply.getLevel();
-		Tile held = (Tile) ply.getHeldItem();
-		Tile before;
-		if(held.isForeground())
-			before = lvl.getFg(x, y);
-		else
-			before = lvl.getBg(x, y);
-		boolean worked = true;
-		if(held.isForeground())
-			worked = lvl.getFgId(x, y) == TileId.AIR;
-		if(worked)
-			worked = lvl.setTile(x, y, held);
-		Tile after;
-		if(held.isForeground())
-			after = lvl.getFg(x, y);
-		else
-			after = lvl.getBg(x, y);
-		if(before != after && worked && !parent.isMultiplayer()) {
-			ply.getInventory().removeOneItem(ply.getPlayerInventory().getQuickbar().getSelectedSlot());
-		}
-		return new TileEditResult(ActionResult.TILE_PLACE, held.getId(), 0, held.isForeground() ? 1 : 0);
-	}
-	
-	private TileEditResult deleteTile(Player ply, int x, int y) {
-		Level lvl = ply.getLevel();
-		int fg = lvl.getFgId(x, y);
-		int fgdata = lvl.getFgData(x, y);
-		if(fg == TileId.AIR) {
-			int bg = lvl.getBgId(x, y);
-			int bgdata = lvl.getBgData(x, y);
-			if(!TileTypes.playerBreakable(bg))
-				return new TileEditResult(ActionResult.FAILURE);
-			else if(lvl.setTile(x, y, TileTypes.getDefaultBg())) {
-				ItemStack it = new ItemStack(TileTypes.getTile(bg), 1);
-				if(TileTypes.getTile(bg).hasData() && !TileTypes.getTile(bg).isMultidirectional())
-					it.setData(bgdata);
-				if(!parent.isMultiplayer())
-					ply.getInventory().addItemStack(it);
-				return new TileEditResult(ActionResult.TILE_BREAK, bg, bgdata, 0);
-			}
-			else
-				return new TileEditResult(ActionResult.FAILURE);
-		}
-		else if(!TileTypes.playerBreakable(fg)) {
-			return new TileEditResult(ActionResult.FAILURE);
-		}
-		else if (lvl.setTile(x, y, TileTypes.getDefaultFg())) {
-			ItemStack it = new ItemStack(TileTypes.getTile(fg), 1);
-			if(TileTypes.getTile(fg).hasData() && !TileTypes.getTile(fg).isMultidirectional())
-				it.setData(fgdata);
-			if(!parent.isMultiplayer())
-				ply.getInventory().addItemStack(it);
-			return new TileEditResult(ActionResult.TILE_BREAK, fg, fgdata, 1);
-		}
-		else
-			return new TileEditResult(ActionResult.FAILURE);
 	}
 
 	@Override
@@ -223,25 +166,21 @@ public class MainScreen extends GameScreen {
 		Player player = parent.getPlayer();
 		Renderer.renderFilledRect(0, 0, Display.getWidth(), Display.getHeight(), Color.red);
 		Level level = player.getLevel();
+		Location position = player.getTilePosition();
 		// Calculate at what offset to begin rendering the level
 		Location renderStart = new Location(
-				player.getPosition().x - Display.getWidth() / Level.TILESIZE / 2,
-				player.getPosition().y - Display.getHeight() / Level.TILESIZE / 2);
+				position.x - Display.getWidth() / Tile.TILESIZE / 2,
+				position.y - Display.getHeight() / Tile.TILESIZE / 2);
 		// Render the level
 		if(level != null) {
 			// Background
-			renderLevel(renderStart.x, renderStart.y, Display.getWidth() / Level.TILESIZE, Display.getHeight() / Level.TILESIZE, false);
-			// Foreground
-			renderLevel(renderStart.x, renderStart.y, Display.getWidth() / Level.TILESIZE, Display.getHeight() / Level.TILESIZE, true);
+			renderLevel(renderStart.x, renderStart.y, Display.getWidth() / Tile.TILESIZE, Display.getHeight() / Tile.TILESIZE);
 		}
 		// Render the player sprite
-		player.render((player.getPosition().x - renderStart.x) * Level.TILESIZE, (player.getPosition().y - renderStart.y) * Level.TILESIZE);
+		player.render((position.x - renderStart.x) * Tile.TILESIZE, (position.y - renderStart.y) * Tile.TILESIZE);
 		// Render the mouse
 		if(active)
 			renderMouse(renderStart);
-		// Render the player's nametag
-		player.renderNameCentered();
-		
 		// Render the HUD
 		player.getPlayerInventory().getQuickbar().render();
 	}
@@ -251,8 +190,8 @@ public class MainScreen extends GameScreen {
 		Level level = player.getLevel();
 		ItemStack current = null;
 		Color col = transparentGreen;
-		int tx = Mouse.getX() / Level.TILESIZE + renderStart.x;
-		int ty = (Display.getHeight() - Mouse.getY()) / Level.TILESIZE + renderStart.y;
+		int tx = Mouse.getX() / Tile.TILESIZE + renderStart.x;
+		int ty = (Display.getHeight() - Mouse.getY()) / Tile.TILESIZE + renderStart.y;
 		if(player.getPlayerInventory().getQuickbar().getSelectedItemStack() == null // Selected item is null
 				|| (tx == player.getPosition().x && ty == player.getPosition().y) // Cursor is over the player
 				|| tx < 0 || tx >= level.getWidth() || ty < 0 || ty >= level.getHeight()) // Mouse it outside the bounds of the Level
@@ -261,44 +200,32 @@ public class MainScreen extends GameScreen {
 		
 		int mx = Mouse.getX();
 		int my = Mouse.getY();
-		tx = mx / Level.TILESIZE;
-		ty = (Display.getHeight() - my) / Level.TILESIZE;
+		tx = mx / Tile.TILESIZE;
+		ty = (Display.getHeight() - my) / Tile.TILESIZE;
 		if(current != null) {
 			col.bind();
-			current.getItem().render(tx * Level.TILESIZE, ty * Level.TILESIZE);
+			current.getItem().render(tx * Tile.TILESIZE, ty * Tile.TILESIZE);
 		}
 		else {
-			Renderer.renderFilledRect(tx * Level.TILESIZE, ty * Level.TILESIZE, Level.TILESIZE, Level.TILESIZE, col);
+			Renderer.renderFilledRect(tx * Tile.TILESIZE, ty * Tile.TILESIZE, Tile.TILESIZE, Tile.TILESIZE, col);
 		}
 		// Draw border
-		Renderer.renderRect(tx * Level.TILESIZE, ty * Level.TILESIZE, Level.TILESIZE, Level.TILESIZE, Color.black);
+		Renderer.renderRect(tx * Tile.TILESIZE, ty * Tile.TILESIZE, Tile.TILESIZE, Tile.TILESIZE, Color.black);
 	}
 	
-	private void renderLevel(int offX, int offY, int maxWidth, int maxHeight, boolean foreground) {
+	private void renderLevel(int offX, int offY, int maxWidth, int maxHeight) {
 		Player player = parent.getPlayer();
 		Level lvl = player.getLevel();
 		for(int i = offX; i < offX + maxWidth; i++) {
 			for(int j = offY; j < offY + maxHeight; j++) {
-				if(foreground) {
-					Tile fg = lvl.getFg(i, j);
-					if(fg != null && fg.getId() != -1) {
-						if(fg.hasData())
-							fg.render((i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE, lvl.getFgData(i,  j));
-						else
-							fg.render((i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
-					}
+				Tile bg = lvl.getBg(i, j);
+				if(bg != null) {
+					bg.render(lvl, i, j, (i - offX) * Tile.TILESIZE, (j - offY) * Tile.TILESIZE);
 				}
-				else {
-					Tile bg = lvl.getBg(i, j);
-					if(bg != null) {
-						if(bg.hasData()) {
-							bg.render((i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE, lvl.getBgData(i,  j));
-						}
-						else
-							bg.render((i - offX) * Level.TILESIZE, (j - offY) * Level.TILESIZE);
-					}
+				Tile fg = lvl.getFg(i, j);
+				if(fg != null && fg.id != -1) {
+					fg.render(lvl, i, j, (i - offX) * Tile.TILESIZE, (j - offY) * Tile.TILESIZE);
 				}
-				
 			}
 		}
 	}
